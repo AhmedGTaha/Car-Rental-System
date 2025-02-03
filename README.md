@@ -40,8 +40,4 @@ A responsive web-based car rental system that allows users to browse available c
 - Submit a pull request.  
 
 ## License  
-This project is open-source and available under the MIT License.  
-
----
-
-Let me know if you want any modifications.
+This project is open-source and available under the MIT License.
