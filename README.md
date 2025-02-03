@@ -1,7 +1,3 @@
-Here's a README file for your car rental system project, formatted for GitHub:  
-
----
-
 # Car Rental System  
 
 ## Overview  
