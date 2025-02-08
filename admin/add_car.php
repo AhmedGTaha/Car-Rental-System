@@ -21,44 +21,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt_check->bindParam(':plate_No', $plate_No);
         $stmt_check->execute();
         $plate_exists = $stmt_check->fetchColumn();
-
-        if ($plate_exists > 0) {
-            $errors[] = "A car with this plate number already exists.";
+        if ($stmt_check->fetchColumn() > 0) {
+            throw new Exception("A car with this plate number already exists.");
         }
 
-        // Validate inputs
-        if (!preg_match('/^[0-9]+$/', $plate_No)) {
-            $errors[] = 'Invalid plate number';
-        }
-        if (!preg_match('/^[a-zA-Z0-9 -]+$/', $model_name)) {
-            $errors[] = 'Invalid model name';
-        }
-        if (!preg_match('/^(19|20)\d{2}$/', $year)) {
-            $errors[] = 'Invalid model year';
-        }
-        if ($price_day < 0) {
-            $errors[] = 'Invalid price per day';
-        }
-        if (!preg_match('/^[a-zA-Z ]+$/', $color)) {
-            $errors[] = 'Invalid color';
-        }
+        // Validation
+        if (!preg_match('/^[0-9]+$/', $plate_No)) throw new Exception("Invalid plate number.");
+        if (!preg_match('/^[a-zA-Z0-9 -]+$/', $model_name)) throw new Exception("Invalid model name.");
+        if (!preg_match('/^(19|20)\d{2}$/', $year)) throw new Exception("Invalid model year.");
+        if ($price_day < 0) throw new Exception("Invalid price per day.");
+        if (!preg_match('/^[a-zA-Z ]+$/', $color)) throw new Exception("Invalid color.");
 
         // Image validation
         if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
             $errors[] = 'File upload failed';
         } else {
-            if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
-                $errors[] = 'File size exceeds 5MB limit';
-            }
+            if ($_FILES['image']['size'] > 5 * 1024 * 1024) throw new Exception("File size exceeds 5MB limit.");
 
             $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
             $file_mime = mime_content_type($_FILES['image']['tmp_name']);
-            if (!in_array($file_mime, $allowed_types)) {
-                $errors[] = 'Invalid file type';
-            }
-        }
+            if (!in_array($file_mime, $allowed_types)) throw new Exception("Invalid file type.");
 
-        if (empty($errors)) {
             // Sanitize file name and set upload directory
             $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
             $file_extension = strtolower($file_extension);
@@ -95,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
     } catch (Exception $e) {
-        $errors[] = $e->getMessage();
+        echo "<script>alert('" . $e->getMessage() . "');</script>";
     }
 }
 ?>
@@ -119,19 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="card shadow-sm">
             <div class="card-body p-4">    
                 <h3 class="mb-3">Add a Car</h3>
-
-                <!-- Display errors if any -->
-                <?php if (!empty($errors)): ?>
-                    <div class="alert alert-danger">
-                        <ul>
-                            <?php foreach ($errors as $error): ?>
-                                <li><?php echo htmlspecialchars($error); ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                    <?php unset($errors);?>
-                <?php endif; ?>
-
                 <form method="post" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" id="add-car">
                 <div class="mb-3">
                         <label for="plate-number" class="form-label">Plate Number</label>
