@@ -16,6 +16,16 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Car Management</title>
+    <style>
+        .card {
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-4">    
