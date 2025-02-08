@@ -73,6 +73,5 @@ unset($_SESSION['error']); // Remove error after storing it
     });
 </script>
 <?php endif; ?>
-
 </body>
 </html>
