@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!preg_match('/^[0-9]+$/', $plate_No)) {
             $errors[] = 'Invalid plate number';
         }
-        if (!preg_match('/^[a-zA-Z0-9 ]+$/', $model_name)) {
+        if (!preg_match('/^[a-zA-Z0-9 -]+$/', $model_name)) {
             $errors[] = 'Invalid model name';
         }
         if (!preg_match('/^(19|20)\d{2}$/', $year)) {
