@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!preg_match('/^(19|20)\d{2}$/', $year)) {
             $errors[] = 'Invalid model year';
         }
-        if (!preg_match('/^[1-9][0-9]*$/', $price_day)) {
+        if ($price_day < 0) {
             $errors[] = 'Invalid price per day';
         }
         if (!preg_match('/^[a-zA-Z ]+$/', $color)) {
@@ -111,9 +111,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .error {
             border: 2px solid #dc3545 !important;
         }
-        .error-message {
-            color: #dc3545 !important;
-        }
     </style>
 </head>
 <body>
@@ -184,6 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <input type="file" class="form-control" id="image" name="image" required>
                     </div>
                     <button type="submit" class="btn btn-outline-dark">Add Car</button>
+                    <a href="cars.php" class="btn btn-outline-danger">Cancel</a>
                 </form>
             </div>
         </div>
@@ -206,7 +204,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             validateField('plate-number', /^[0-9]+$/);
             validateField('model-name', /^[a-zA-Z0-9 -]+$/);
             validateField('model-year', /^(19|20)\d{2}$/);
-            validateField('price', /^[1-9][0-9]/);
             validateField('color', /^[a-zA-Z ]+$/);
 
             const price = document.getElementById('price');
