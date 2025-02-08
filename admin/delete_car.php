@@ -1,30 +1,44 @@
 <?php
 include('../db_con.php');
 
-// Check if the car ID (plate number) is provided in the URL
-if (isset($_GET['id'])) {
-    $plateNo = $_GET['id'];
+if (!isset($_GET['id'])) {
+    header("Location: cars.php");
+    exit();
+}
 
-    // Prepare the SQL query to delete the car
+$plateNo = $_GET['id'];
+
+try {
+    // Fetch the car image path before deletion
+    $sql = "SELECT car_image FROM Car WHERE plate_No = :plateNo";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':plateNo', $plateNo);
+    $stmt->execute();
+    $car = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$car) {
+        header("Location: cars.php");
+        exit();
+    }
+
+    $car_image = $car['car_image']; // Image path from database
+
+    // Delete the car from the database
     $sql = "DELETE FROM Car WHERE plate_No = :plateNo";
     $stmt = $pdo->prepare($sql);
-    
-    // Bind the plate number to the SQL statement
     $stmt->bindParam(':plateNo', $plateNo);
-
-    // Execute the query
+    
     if ($stmt->execute()) {
-        // Redirect back to the car management page after successful deletion
+        // Delete the image file from the uploads directory
+        if (!empty($car_image) && file_exists($car_image)) {
+            unlink($car_image); // Deletes the file
+        }
         header("Location: cars.php");
         exit();
     } else {
-        // If something goes wrong, show an error message
-        echo "<script>alert('Error: Unable to delete the car.')</script>";
-        exit();
+        throw new Exception("Failed to delete car.");
     }
-} else {
-    // If no ID is provided, redirect to the car management page
-    header("Location: cars.php");
-    exit();
+} catch (Exception $e) {
+    echo "<script>alert('" . $e->getMessage() . "');</script>";
 }
 ?>
