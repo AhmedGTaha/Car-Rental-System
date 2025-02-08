@@ -204,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
             
             validateField('plate-number', /^[0-9]+$/);
-            validateField('model-name', /^[a-zA-Z0-9 ]+$/);
+            validateField('model-name', /^[a-zA-Z0-9 -]+$/);
             validateField('model-year', /^(19|20)\d{2}$/);
             validateField('price', /^[1-9][0-9]/);
             validateField('color', /^[a-zA-Z ]+$/);
