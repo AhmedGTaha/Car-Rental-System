@@ -19,7 +19,7 @@ if (isset($_GET['id'])) {
         exit();
     } else {
         // If something goes wrong, show an error message
-        echo "Error: Unable to delete the car.";
+        echo "<script>alert('Error: Unable to delete the car.')</script>";
         exit();
     }
 } else {

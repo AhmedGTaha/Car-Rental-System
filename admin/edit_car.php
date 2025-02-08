@@ -14,12 +14,12 @@ if (isset($_GET['id'])) {
 
     // If the car does not exist, redirect to car management page
     if (!$car) {
-        header("Location: car_management.php");
+        header("Location: cars.php");
         exit();
     }
 } else {
     // If no ID is provided, redirect to car management page
-    header("Location: car_management.php");
+    header("Location: cars.php");
     exit();
 }
 
@@ -51,10 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($stmt->execute()) {
         // Redirect to car management page after successful update
-        header("Location: car_management.php");
+        header("Location: cars.php");
         exit();
     } else {
-        echo "Error: Unable to update the car details.";
+        echo "<script>alert('Error: Unable to update the car details.')</script>";
     }
 }
 ?>
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <div class="container mt-4">
         <h1 class="text-center mb-4">Edit Car Details</h1>
-        <form method="POST" action="edit_car.php?id=<?php echo $car['plate_No']; ?>">
+        <form method="POST" action="edit_car.php?id=<?php echo $car['plate_No']; ?>" id="edit-car">
             <div class="mb-3">
                 <label for="model_name" class="form-label">Model Name</label>
                 <input type="text" class="form-control" id="model_name" name="model_name" value="<?php echo htmlspecialchars($car['model_name']); ?>" required>
@@ -81,11 +81,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <div class="mb-3">
                 <label for="type" class="form-label">Type</label>
-                <input type="text" class="form-control" id="type" name="type" value="<?php echo htmlspecialchars($car['type']); ?>" required>
+                <select class="form-select" id="type" name="type" required>
+                    <option value="sedan" selected>Sedan</option>
+                    <option value="SUV">SUV</option>
+                    <option value="sport">Sport</option>
+                    <option value="pickup">Pickup</option>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="transmission" class="form-label">Transmission</label>
-                <input type="text" class="form-control" id="transmission" name="transmission" value="<?php echo htmlspecialchars($car['transmission']); ?>" required>
+                <select class="form-select" id="transmission" name="transmission" required>
+                    <option value="automatic" selected>Automatic</option>
+                    <option value="manual">Manual</option>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="price_day" class="form-label">Price per Day</label>
@@ -93,19 +101,56 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <div class="mb-3">
                 <label for="status" class="form-label">Status</label>
-                <input type="text" class="form-control" id="status" name="status" value="<?php echo htmlspecialchars($car['status']); ?>" required>
+                <select class="form-select" id="status" name="status" required>
+                    <option value="available" selected>Available</option>
+                    <option value="rented">Rented</option>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="color" class="form-label">Color</label>
                 <input type="text" class="form-control" id="color" name="color" value="<?php echo htmlspecialchars($car['color']); ?>" required>
             </div>
             <div class="mb-3">
-                <label for="car_image" class="form-label">Car Image URL</label>
+                <label for="car_image" class="form-label">Car Image</label>
                 <input type="text" class="form-control" id="car_image" name="car_image" value="<?php echo htmlspecialchars($car['car_image']); ?>" required>
             </div>
             <button type="submit" class="btn btn-primary">Update Car</button>
             <a href="cars.php" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
+    <script>
+        document.getElementById('edit-car').addEventListener('submit', function(event) {
+            let valid = true;
+            
+            function validateField(id, regex) {
+                const field = document.getElementById(id);
+                if (!regex.test(field.value.trim())) {
+                    field.classList.add('error');
+                    valid = false;
+                } else {
+                    field.classList.remove('error');
+                }
+            }
+            
+            validateField('plate-number', /^[0-9]+$/);
+            validateField('model-name', /^[a-zA-Z0-9 -]+$/);
+            validateField('model-year', /^(19|20)\d{2}$/);
+            validateField('price', /^[1-9][0-9]/);
+            validateField('color', /^[a-zA-Z ]+$/);
+
+            const price = document.getElementById('price');
+            if (price.value <= 0) {
+                alert('Price must be greater than 0.');
+                price.classList.add('error');
+                valid = false;
+            } else {
+                price.classList.remove('error');
+            }
+
+            if (!valid) {
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>
