@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                     <div class="mb-3">
                         <label for="price" class="form-label">Price/Day</label>
-                        <input type="number" class="form-control" id="price" name="price" placeholder="10" required>
+                        <input type="number" step="0.01" class="form-control" id="price" name="price" placeholder="10" required>
                     </div>
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
