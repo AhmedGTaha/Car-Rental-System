@@ -27,14 +27,16 @@ CREATE TABLE Car (
 
 -- Booking Table
 CREATE TABLE Booking (
-    bookingID INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT,
+    booking_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    user_email VARCHAR(255) NOT NULL,
     plate_No VARCHAR(20),
-    startDate DATE NOT NULL,
-    endDate DATE NOT NULL,
-    totalPrice DECIMAL(10,2) CHECK (totalPrice >= 0),
-    status ENUM('pending', 'confirmed', 'canceled') DEFAULT 'pending',
-    FOREIGN KEY (userID) REFERENCES User(ID) ON DELETE CASCADE,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    total_price DECIMAL(10,2) CHECK (total_price >= 0),
+    status ENUM('confirmed', 'canceled') DEFAULT 'confirmed',
+    FOREIGN KEY (user_id) REFERENCES User(ID) ON DELETE CASCADE,
+    FOREIGN KEY (user_email) REFERENCES User(email) ON DELETE CASCADE,
     FOREIGN KEY (plate_No) REFERENCES Car(plate_No) ON DELETE CASCADE,
-    CHECK (startDate < endDate) -- Ensure valid date range
+    CHECK (start_date < end_date)
 );

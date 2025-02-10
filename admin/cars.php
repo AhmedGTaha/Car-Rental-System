@@ -57,7 +57,7 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </i>
                             </p>
                             <a href="edit_car.php?id=<?php echo $car['plate_No']; ?>" class="btn btn-outline-dark">Edit</a>
-                            <a href="delete_car.php?id=<?php echo $car['plate_No']; ?>" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to remove this car?');">Remove</a>
+                            <a href="delete_car.php?id=<?php echo $car['plate_No']; ?>" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to remove this car?');">Delete</a>
                         </div>
                     </div>
                 </div>
