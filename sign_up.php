@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'phone' => $phone,
             'password' => $hashedPassword,
             'role' => $role,
-            'image' => "pic/user.png"
+            'image' => "..\pic\user.png"
         ]);
 
         $_SESSION['registration_success'] = "Account created successfully!";
@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <button type="submit" class="btn btn-outline-dark">Create Account</button>
                         </div>
                     </form>
-                    <p class="text-body-secondary" style="text-align: center;">Already have an account? <a href="login.php" class="text-decoration-none">Login</a></p>
+                    <p class="text-body-secondary" style="text-align: center;">Already have an account? <a href="login.php" class="text-decoration-none" style="color:#006aff;">Login</a></p>
                 </div>
             </div>
         </div>

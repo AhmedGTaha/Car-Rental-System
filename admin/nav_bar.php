@@ -110,10 +110,10 @@ nav svg{
             </label>
 
             <a href="admin_dashboard.php">Admin Dashboard</a>
-            <a href="profile.php">Profile</a>
+            <a href="profile.php">Edit Profile</a>
             <a href="cars.php">Car Management</a>
             <a href="users.php">User Management</a>
-            <a href="Bookings.php">Bookings</a>
+            <a href="bookings.php">Bookings</a>
 
         </div>
     </nav>

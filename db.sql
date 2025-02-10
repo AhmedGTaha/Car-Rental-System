@@ -9,7 +9,7 @@ CREATE TABLE User (
     phone_No VARCHAR(20) NOT NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'customer') NOT NULL,
-    profile_image VARCHAR(255) DEFAULT 'pic/user.png' -- Corrected file path
+    profile_image VARCHAR(255) DEFAULT '..\pic\user.png' -- Corrected file path
 );
 
 -- Car Table
@@ -22,7 +22,7 @@ CREATE TABLE Car (
     price_day DECIMAL(10,2) NOT NULL CHECK (price_Day >= 0),
     status ENUM('available', 'rented') DEFAULT 'available',
     color VARCHAR(50) NOT NULL,
-    car_image VARCHAR(255) DEFAULT 'pic/car.jpg'
+    car_image VARCHAR(255) DEFAULT '..\pic\car.jpg'
 );
 
 -- Booking Table

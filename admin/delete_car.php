@@ -30,7 +30,7 @@ try {
     
     if ($stmt->execute()) {
         // Delete the image file from the uploads directory
-        if (!empty($car_image) && file_exists($car_image)) {
+        if (!empty($car_image) && file_exists($car_image) && $car_image != '..\pic\car.jpg') {
             unlink($car_image); // Deletes the file
         }
         header("Location: cars.php");

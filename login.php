@@ -51,7 +51,7 @@ unset($_SESSION['error']); // Remove error after storing it
                             <button type="submit" class="btn btn-outline-dark">Login</button>
                         </div>
                     </form>
-                    <p class="text-body-secondary text-center">Don't have an account? <a href="sign_up.php" class="text-decoration-none">Sign Up</a></p>
+                    <p class="text-body-secondary text-center">Don't have an account? <a href="sign_up.php" class="text-decoration-none" style="color:#006aff;">Sign Up</a></p>
 
                 </div>
             </div>
