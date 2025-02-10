@@ -1,6 +1,7 @@
 <?php
-include('../db_con.php');
-include('nav_bar.php');
+session_start();
+include ('../db_con.php');
+include ('nav_bar.php');
 
 if (!isset($_GET['id'])) {
     header("Location: cars.php");
