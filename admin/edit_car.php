@@ -34,9 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $type = trim($_POST['type']);
     $transmission = trim($_POST['transmission']);
     $price_day = trim($_POST['price']);
-    $status = trim($_POST['status']);
+    $status = $car['status'];
     $color = trim($_POST['color']);
-    $car_image = $car['car_image']; // Keep existing image
+    $car_image = $car['car_image']; // Keep existing image by default
 
     try {
         // Validate Plate Number Uniqueness (excluding current car)
@@ -56,26 +56,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($price_day < 0) throw new Exception("Invalid price per day.");
         if (!preg_match('/^[a-zA-Z ]+$/', $color)) throw new Exception("Invalid color.");
 
-        // Image Upload Handling
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            if ($_FILES['image']['size'] > 5 * 1024 * 1024) throw new Exception("File size exceeds 5MB limit.");
+        // Image Upload Handling (Optional)
+        if (!empty($_FILES['car_image']['name']) && $_FILES['car_image']['error'] === UPLOAD_ERR_OK) {
+            if ($_FILES['car_image']['size'] > 5 * 1024 * 1024) throw new Exception("File size exceeds 5MB limit.");
 
             $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-            $file_mime = mime_content_type($_FILES['image']['tmp_name']);
+            $file_mime = mime_content_type($_FILES['car_image']['tmp_name']);
             if (!in_array($file_mime, $allowed_types)) throw new Exception("Invalid file type.");
 
             // Generate unique file name
-            $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $file_extension = pathinfo($_FILES['car_image']['name'], PATHINFO_EXTENSION);
             $unique_name = uniqid() . '.' . strtolower($file_extension);
             $target_directory = '../uploads/';
             $target_file = $target_directory . $unique_name;
 
-            if (!move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+            if (!move_uploaded_file($_FILES['car_image']['tmp_name'], $target_file)) {
                 throw new Exception("Failed to save uploaded file.");
             }
 
             chmod($target_file, 0644);
-            $car_image = $target_file; // Update image path
+            $car_image = $target_file; // Update image path if a new one is uploaded
         }
 
         // Update query
@@ -101,7 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             throw new Exception("Error updating car details.");
         }
-
     } catch (Exception $e) {
         echo "<script>alert('" . $e->getMessage() . "');</script>";
     }
@@ -161,8 +160,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <input type="text" class="form-control" id="color" name="color" value="<?php echo htmlspecialchars($car['color']); ?>" required>
             </div>
             <div class="mb-3">
-                <label for="car_image" class="form-label">Car Image</label>
-                <input type="text" class="form-control" id="car_image" name="car_image" value="<?php echo htmlspecialchars($car['car_image']); ?>" required disabled>
+                <label for="car_image" class="form-label">Car Image (Optional)</label>
+                <input type="file" class="form-control" id="car_image" name="car_image">
+                <?php if (!empty($car['car_image'])): ?>
+                    <p>Current Image: <img src="<?php echo $car['car_image']; ?>" alt="Car Image" width="100"></p>
+                <?php endif; ?>
             </div>
             <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to edit this car details?');">Update Car</button>
             <a href="cars.php" class="btn btn-outline-dark">Cancel</a>
