@@ -1,6 +1,18 @@
 <?php
+session_start();
 include('../db_con.php');
 include('nav_bar.php');
+
+try {
+    // Fetch all bookings from the database
+    $sql = "SELECT * FROM Booking";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "<script>alert('Error fetching bookings')<script>";
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,17 +40,17 @@ include('nav_bar.php');
         <h1 class="text-center mb-4">Bookings Management</h1>      
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <!-- Fetch and display bookings data -->
-            <?php foreach ():?>
-                <?php if ():?>
+            <?php foreach ($bookings as $booking):?>
+                <?php if ($booking['status'] == 'confirmed'):?>
                     <div class="col">
                         <div class="card user-card">
                             <div class="card-body text-center">
-                                <h5 class="card-title"></h5>
-                                <p class="card-text">Customer: - </p>
-                                <p class="card-text">Car: - </p>
-                                <p class="card-text">Dates: - </p>
-                                <p class="card-text">Fees: </p>
-                                <p class="card-text">Status: </p>
+                                <h5 class="card-title"><?php echo htmlspecialchars($booking['booking_id'])?></h5>
+                                <p class="card-text">Car: <?php echo htmlspecialchars($booking['plate_No'])?></p>
+                                <p class="card-text">Customer: <?php echo htmlspecialchars($booking['user_id'])?></p>
+                                <p class="card-text">Dates: <?php echo htmlspecialchars($booking['start_date'])?> - <?php echo htmlspecialchars($booking['end_date'])?></p>
+                                <p class="card-text">Fees: <?php echo htmlspecialchars($booking['total_price'])?></p>
+                                <p class="card-text">Status: <?php echo htmlspecialchars($booking['status'])?></p>
                                 <a href="delete_booking.php?id=" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to cancel?');">Cancel Booking</a>
                             </div>
                         </div>

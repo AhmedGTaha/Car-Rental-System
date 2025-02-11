@@ -3,11 +3,16 @@ session_start();
 include ('../db_con.php');
 include ('nav_bar.php');
 
+try {
 // Fetch all cars from the database
 $sql = "SELECT * FROM Car";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "<script>alert('Error fetching bookings')<script>";
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -49,15 +54,20 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <p class="card-text">Transmission: <?php echo htmlspecialchars($car['transmission'])?></p>
                             <p class="card-text">Price/Day: BD<?php echo htmlspecialchars($car['price_day'])?></p>
                             <p class="card-text">Color: <?php echo htmlspecialchars($car['color'])?></p>
-                            <p class="card-text"">Status: <i class="card-text" id="status" style="color:#198754;">
-                                <?php if(htmlspecialchars($car['status']) != 'available'):?>
-                                    <script>document.getElementById("status").style.color = "#dc3545";</script>
-                                    <?php endif;?>
-                                    <?php echo htmlspecialchars($car['status'])?>
-                            </i>
+                            <p class="card-text">Status: 
+                                <large class="card-text" style="color:<?php echo ($car['status'] === 'rented') ? '#dc3545' : '#198754'; ?>;">
+                                    <?php echo htmlspecialchars($car['status']); ?>
+                                </large>
                             </p>
-                            <a href="edit_car.php?id=<?php echo $car['plate_No']; ?>" class="btn btn-outline-dark">Edit</a>
-                            <a href="delete_car.php?id=<?php echo $car['plate_No']; ?>" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to remove this car?');">Delete</a>
+                            <a href="edit_car.php?id=<?php echo $car['plate_No']; ?>" 
+                               class="btn btn-outline-dark <?php echo ($car['status'] === 'rented') ? 'disabled' : ''; ?>">
+                                Edit
+                            </a>
+                            <a href="delete_car.php?id=<?php echo $car['plate_No']; ?>" 
+                               class="btn btn-outline-danger <?php echo ($car['status'] === 'rented') ? 'disabled' : ''; ?>" 
+                               onclick="return confirm('Are you sure you want to remove this car?');">
+                                Delete
+                            </a>
                         </div>
                     </div>
                 </div>

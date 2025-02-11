@@ -3,11 +3,16 @@ session_start();
 include ('../db_con.php');
 include ('nav_bar.php');
 
+try {
 // Fetch all users from the database
 $sql ="SELECT * FROM User";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  echo "<script>alert('Error fetching users')<script>";
+  exit();
+}
 ?>
 
 <!DOCTYPE html>

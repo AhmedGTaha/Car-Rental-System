@@ -22,10 +22,13 @@ if (!$car) {
     exit();
 }
 
-$errors = [];
+// Prevent editing if car is rented
+if ($car['status'] === 'rented') {
+    echo "<script>alert('Cannot edit a rented car.'); window.location.href='cars.php';</script>";
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $plate_No = $plateNo;
     $model_name = trim($_POST['model-name']);
     $year = trim($_POST['model-year']);
     $type = trim($_POST['type']);
@@ -33,13 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $price_day = trim($_POST['price']);
     $status = trim($_POST['status']);
     $color = trim($_POST['color']);
-    $car_image = $car['car_image']; // Default to existing image
+    $car_image = $car['car_image']; // Keep existing image
 
     try {
-        // Check if plate number exists excluding the current car
+        // Validate Plate Number Uniqueness (excluding current car)
         $sql_check = "SELECT COUNT(*) FROM Car WHERE plate_No = :plate_No AND plate_No != :current_plate";
         $stmt_check = $pdo->prepare($sql_check);
-        $stmt_check->bindParam(':plate_No', $plate_No);
+        $stmt_check->bindParam(':plate_No', $plateNo);
         $stmt_check->bindParam(':current_plate', $plateNo);
         $stmt_check->execute();
         if ($stmt_check->fetchColumn() > 0) {
@@ -47,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         // Validation
-        if (!preg_match('/^[0-9]+$/', $plate_No)) throw new Exception("Invalid plate number.");
+        if (!preg_match('/^[0-9]+$/', $plateNo)) throw new Exception("Invalid plate number.");
         if (!preg_match('/^[a-zA-Z0-9 -]+$/', $model_name)) throw new Exception("Invalid model name.");
         if (!preg_match('/^(19|20)\d{2}$/', $year)) throw new Exception("Invalid model year.");
         if ($price_day < 0) throw new Exception("Invalid price per day.");
@@ -98,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             throw new Exception("Error updating car details.");
         }
+
     } catch (Exception $e) {
         echo "<script>alert('" . $e->getMessage() . "');</script>";
     }
@@ -151,13 +155,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="mb-3">
                 <label for="price_day" class="form-label">Price per Day</label>
                 <input type="number" step="0.01" class="form-control" id="price" name="price" value="<?php echo htmlspecialchars($car['price_day']); ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="status" class="form-label">Status</label>
-                <select class="form-select" id="status" name="status" required>
-                    <option value="available" selected>Available</option>
-                    <option value="rented">Rented</option>
-                </select>
             </div>
             <div class="mb-3">
                 <label for="color" class="form-label">Color</label>
