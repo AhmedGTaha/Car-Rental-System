@@ -13,12 +13,15 @@
 </head>
 <body>
     <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 text-center">
-                <h1 class="display-4">Welcome, Customer</h1>
-                <p class="lead">Explore our selection of available rental cars and make your booking today!</p>
-                <a href="../logout_process.php" class="btn btn-danger btn-lg mt-3">Log Out</a>
+        <header>
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <h1 class="display-4">Welcome, <?php echo htmlspecialchars( $_SESSION['user_name']);?></h1>
+                    <p class="lead">Explore our selection of available rental cars and make your booking today!</p>
+                    <a href="../logout_process.php" class="btn btn-danger btn-lg mt-3">Log Out</a>
+                </div>
             </div>
-        </div>
+        </header>
+    </div>
 </body>
 </html>
