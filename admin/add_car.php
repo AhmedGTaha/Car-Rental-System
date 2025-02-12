@@ -1,9 +1,15 @@
 <?php
 session_start();
-include ('../db_con.php');
-include ('nav_bar.php');
+include('../db_con.php');
+include('nav_bar.php');
+
+// Clear previous errors and input on initial load
+if (empty($_POST) && isset($_SESSION['errors'])) {
+    unset($_SESSION['errors'], $_SESSION['old_input']);
+}
 
 $errors = [];
+$old_input = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $plate_No = trim($_POST['plate-number']);
@@ -15,38 +21,76 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $status = trim($_POST['status']);
     $color = trim($_POST['color']);
 
-    try {
-        // Check if plate number already exists
-        $sql_check = "SELECT COUNT(*) FROM Car WHERE plate_No = :plate_No";
-        $stmt_check = $pdo->prepare($sql_check);
-        $stmt_check->bindParam(':plate_No', $plate_No);
-        $stmt_check->execute();
-        $plate_exists = $stmt_check->fetchColumn();
-        if ($stmt_check->fetchColumn() > 0) {
-            throw new Exception("A car with this plate number already exists.");
+    // Validate plate number
+    if (empty($plate_No)) {
+        $errors['plate-number'] = "Plate number is required";
+    } elseif (!preg_match('/^[0-9]+$/', $plate_No)) {
+        $errors['plate-number'] = "Invalid plate number (numbers only)";
+    }
+
+    // Validate model name
+    if (empty($model_name)) {
+        $errors['model-name'] = "Model name is required";
+    } elseif (!preg_match('/^[a-zA-Z0-9 -]+$/', $model_name)) {
+        $errors['model-name'] = "Invalid model name (alphanumeric characters and hyphens only)";
+    }
+
+    // Validate year
+    if (empty($year)) {
+        $errors['model-year'] = "Model year is required";
+    } elseif (!preg_match('/^(19|20)\d{2}$/', $year)) {
+        $errors['model-year'] = "Invalid model year (1900-2099)";
+    }
+
+    // Validate price
+    if (empty($price_day)) {
+        $errors['price'] = "Price is required";
+    } elseif ($price_day <= 0) {
+        $errors['price'] = "Price must be greater than 0";
+    }
+
+    // Validate color
+    if (empty($color)) {
+        $errors['color'] = "Color is required";
+    } elseif (!preg_match('/^[a-zA-Z ]+$/', $color)) {
+        $errors['color'] = "Invalid color (letters and spaces only)";
+    }
+
+    // Validate image
+    if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+        $errors['image'] = "Car image is required";
+    } else {
+        if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
+            $errors['image'] = "File size exceeds 5MB limit";
         }
 
-        // Validation
-        if (!preg_match('/^[0-9]+$/', $plate_No)) throw new Exception("Invalid plate number.");
-        if (!preg_match('/^[a-zA-Z0-9 -]+$/', $model_name)) throw new Exception("Invalid model name.");
-        if (!preg_match('/^(19|20)\d{2}$/', $year)) throw new Exception("Invalid model year.");
-        if ($price_day < 0) throw new Exception("Invalid price per day.");
-        if (!preg_match('/^[a-zA-Z ]+$/', $color)) throw new Exception("Invalid color.");
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+        $file_mime = mime_content_type($_FILES['image']['tmp_name']);
+        if (!in_array($file_mime, $allowed_types)) {
+            $errors['image'] = "Invalid file type (only JPG, PNG, GIF allowed)";
+        }
+    }
 
-        // Image validation
-        if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-            $errors[] = 'File upload failed';
-        } else {
-            if ($_FILES['image']['size'] > 5 * 1024 * 1024) throw new Exception("File size exceeds 5MB limit.");
+    // Check plate number uniqueness
+    if (empty($errors)) {
+        try {
+            $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM Car WHERE plate_No = :plate_No");
+            $stmt_check->bindParam(':plate_No', $plate_No);
+            $stmt_check->execute();
+            
+            if ($stmt_check->fetchColumn() > 0) {
+                $errors['plate-number'] = "A car with this plate number already exists";
+            }
+        } catch (PDOException $e) {
+            $errors['database'] = "Database error: " . $e->getMessage();
+        }
+    }
 
-            $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-            $file_mime = mime_content_type($_FILES['image']['tmp_name']);
-            if (!in_array($file_mime, $allowed_types)) throw new Exception("Invalid file type.");
-
-            // Sanitize file name and set upload directory
+    if (empty($errors)) {
+        try {
+            // Process image upload
             $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-            $file_extension = strtolower($file_extension);
-            $unique_name = uniqid() . '.' . $file_extension;
+            $unique_name = uniqid() . '.' . strtolower($file_extension);
             $target_directory = '../uploads/';
             $target_file = $target_directory . $unique_name;
 
@@ -61,25 +105,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     VALUES (:plate_No, :model_name, :model_year, :type, :transmission, :price_day, :status, :color, :car_image)";
             
             $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':plate_No', $plate_No);
-            $stmt->bindParam(':model_name', $model_name);
-            $stmt->bindParam(':model_year', $year);
-            $stmt->bindParam(':type', $type);
-            $stmt->bindParam(':transmission', $transmission);
-            $stmt->bindParam(':price_day', $price_day);
-            $stmt->bindParam(':status', $status);
-            $stmt->bindParam(':color', $color);
-            $stmt->bindParam(':car_image', $target_file);
+            $stmt->execute([
+                'plate_No' => $plate_No,
+                'model_name' => $model_name,
+                'model_year' => $year,
+                'type' => $type,
+                'transmission' => $transmission,
+                'price_day' => $price_day,
+                'status' => $status,
+                'color' => $color,
+                'car_image' => $target_file
+            ]);
 
-            if ($stmt->execute()) {
-                header('Location: cars.php');
-                exit();
-            } else {
-                throw new Exception("Failed to add car. Please try again.");
-            }
+            header('Location: cars.php');
+            exit();
+        } catch (Exception $e) {
+            $errors['database'] = "Error: " . $e->getMessage();
         }
-    } catch (Exception $e) {
-        echo "<script>alert('" . $e->getMessage() . "');</script>";
+    }
+
+    if (!empty($errors)) {
+        $_SESSION['errors'] = $errors;
+        $_SESSION['old_input'] = $_POST;
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
     }
 }
 ?>
@@ -92,9 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Add Car</title>
     <style>
-        .error {
-            border: 2px solid #dc3545 !important;
-        }
+        .error-border { border: 2px solid #dc3545 !important; }
+        .error-message { color: #dc3545; font-size: 0.875em; margin-top: 0.25rem; }
     </style>
 </head>
 <body>
@@ -103,93 +151,184 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="card shadow-sm">
             <div class="card-body p-4">    
                 <h3 class="mb-3">Add a Car</h3>
-                <form method="post" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" id="add-car">
-                <div class="mb-3">
-                        <label for="plate-number" class="form-label">Plate Number</label>
-                        <input type="number" class="form-control" id="plate-number" name="plate-number" placeholder="123123" required>
+                
+                <?php if (isset($_SESSION['errors']['database'])): ?>
+                    <div class="alert alert-danger">
+                        <?= htmlspecialchars($_SESSION['errors']['database']) ?>
                     </div>
+                <?php endif; ?>
+
+                <form method="post" enctype="multipart/form-data" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" id="add-car">
+                    <div class="mb-3">
+                        <label for="plate-number" class="form-label">Plate Number</label>
+                        <input type="number" class="form-control <?= isset($_SESSION['errors']['plate-number']) ? 'error-border' : '' ?>" 
+                               id="plate-number" name="plate-number" 
+                               value="<?= htmlspecialchars($_SESSION['old_input']['plate-number'] ?? '') ?>" required>
+                        <?php if (isset($_SESSION['errors']['plate-number'])): ?>
+                            <div class="error-message"><?= $_SESSION['errors']['plate-number'] ?></div>
+                        <?php endif; ?>
+                    </div>
+
                     <div class="mb-3">
                         <label for="model-name" class="form-label">Model Name</label>
-                        <input type="text" class="form-control" id="model-name" name="model-name" placeholder="xxxx" required>
+                        <input type="text" class="form-control <?= isset($_SESSION['errors']['model-name']) ? 'error-border' : '' ?>" 
+                               id="model-name" name="model-name" 
+                               value="<?= htmlspecialchars($_SESSION['old_input']['model-name'] ?? '') ?>" required>
+                        <?php if (isset($_SESSION['errors']['model-name'])): ?>
+                            <div class="error-message"><?= $_SESSION['errors']['model-name'] ?></div>
+                        <?php endif; ?>
                     </div>
+
                     <div class="mb-3">
                         <label for="model-year" class="form-label">Model Year</label>
-                        <input type="number" class="form-control" id="model-year" name="model-year" placeholder="2025" required>
+                        <input type="number" class="form-control <?= isset($_SESSION['errors']['model-year']) ? 'error-border' : '' ?>" 
+                               id="model-year" name="model-year" 
+                               value="<?= htmlspecialchars($_SESSION['old_input']['model-year'] ?? '') ?>" required>
+                        <?php if (isset($_SESSION['errors']['model-year'])): ?>
+                            <div class="error-message"><?= $_SESSION['errors']['model-year'] ?></div>
+                        <?php endif; ?>
                     </div>
+
                     <div class="mb-3">
                         <label for="type" class="form-label">Type</label>
                         <select class="form-select" id="type" name="type" required>
-                            <option value="sedan" selected>Sedan</option>
-                            <option value="SUV">SUV</option>
-                            <option value="sport">Sport</option>
-                            <option value="pickup">Pickup</option>
+                            <?php $oldType = $_SESSION['old_input']['type'] ?? 'sedan'; ?>
+                            <option value="sedan" <?= $oldType === 'sedan' ? 'selected' : '' ?>>Sedan</option>
+                            <option value="SUV" <?= $oldType === 'SUV' ? 'selected' : '' ?>>SUV</option>
+                            <option value="sport" <?= $oldType === 'sport' ? 'selected' : '' ?>>Sport</option>
+                            <option value="pickup" <?= $oldType === 'pickup' ? 'selected' : '' ?>>Pickup</option>
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="transmission" class="form-label">Transmission</label>
                         <select class="form-select" id="transmission" name="transmission" required>
-                            <option value="automatic" selected>Automatic</option>
-                            <option value="manual">Manual</option>
+                            <?php $oldTrans = $_SESSION['old_input']['transmission'] ?? 'automatic'; ?>
+                            <option value="automatic" <?= $oldTrans === 'automatic' ? 'selected' : '' ?>>Automatic</option>
+                            <option value="manual" <?= $oldTrans === 'manual' ? 'selected' : '' ?>>Manual</option>
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="price" class="form-label">Price/Day</label>
-                        <input type="number" step="0.01" class="form-control" id="price" name="price" placeholder="10" required>
+                        <input type="number" step="0.01" class="form-control <?= isset($_SESSION['errors']['price']) ? 'error-border' : '' ?>" 
+                               id="price" name="price" 
+                               value="<?= htmlspecialchars($_SESSION['old_input']['price'] ?? '') ?>" required>
+                        <?php if (isset($_SESSION['errors']['price'])): ?>
+                            <div class="error-message"><?= $_SESSION['errors']['price'] ?></div>
+                        <?php endif; ?>
                     </div>
+
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
                         <select class="form-select" id="status" name="status" required>
-                            <option value="available" selected>Available</option>
-                            <option value="rented">Rented</option>
+                            <?php $oldStatus = $_SESSION['old_input']['status'] ?? 'available'; ?>
+                            <option value="available" <?= $oldStatus === 'available' ? 'selected' : '' ?>>Available</option>
+                            <option value="rented" <?= $oldStatus === 'rented' ? 'selected' : '' ?>>Rented</option>
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="color" class="form-label">Color</label>
-                        <input type="text" class="form-control" id="color" name="color" placeholder="Black" required>
+                        <input type="text" class="form-control <?= isset($_SESSION['errors']['color']) ? 'error-border' : '' ?>" 
+                               id="color" name="color" 
+                               value="<?= htmlspecialchars($_SESSION['old_input']['color'] ?? '') ?>" required>
+                        <?php if (isset($_SESSION['errors']['color'])): ?>
+                            <div class="error-message"><?= $_SESSION['errors']['color'] ?></div>
+                        <?php endif; ?>
                     </div>
+
                     <div class="mb-3">
                         <label for="image" class="form-label">Car Image</label>
-                        <input type="file" class="form-control" id="image" name="image" required>
+                        <input type="file" class="form-control <?= isset($_SESSION['errors']['image']) ? 'error-border' : '' ?>" 
+                               id="image" name="image" required>
+                        <?php if (isset($_SESSION['errors']['image'])): ?>
+                            <div class="error-message"><?= $_SESSION['errors']['image'] ?></div>
+                        <?php endif; ?>
                     </div>
+
                     <button type="submit" class="btn btn-outline-dark">Add Car</button>
                     <a href="cars.php" class="btn btn-outline-danger">Cancel</a>
                 </form>
             </div>
         </div>
     </div>
-    
+
     <script>
-        document.getElementById('add-car').addEventListener('submit', function(event) {
-            let valid = true;
-            
-            function validateField(id, regex) {
-                const field = document.getElementById(id);
-                if (!regex.test(field.value.trim())) {
-                    field.classList.add('error');
-                    valid = false;
+    document.getElementById('add-car').addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        function validateField(field, regex, errorMessage) {
+            const errorDiv = field.nextElementSibling;
+            if (!regex.test(field.value.trim())) {
+                field.classList.add('error-border');
+                if (!errorDiv || !errorDiv.classList.contains('error-message')) {
+                    const newError = document.createElement('div');
+                    newError.className = 'error-message';
+                    newError.textContent = errorMessage;
+                    field.parentNode.insertBefore(newError, field.nextSibling);
                 } else {
-                    field.classList.remove('error');
+                    errorDiv.textContent = errorMessage;
+                }
+                isValid = false;
+            } else {
+                field.classList.remove('error-border');
+                if (errorDiv && errorDiv.classList.contains('error-message')) {
+                    errorDiv.remove();
                 }
             }
-            
-            validateField('plate-number', /^[0-9]+$/);
-            validateField('model-name', /^[a-zA-Z0-9 -]+$/);
-            validateField('model-year', /^(19|20)\d{2}$/);
-            validateField('color', /^[a-zA-Z ]+$/);
+        }
 
-            const price = document.getElementById('price');
-            if (price.value <= 0) {
-                alert('Price must be greater than 0.');
-                price.classList.add('error');
-                valid = false;
-            } else {
-                price.classList.remove('error');
-            }
+        // Clear previous errors
+        document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
+        document.querySelectorAll('.error-message').forEach(el => el.remove());
 
-            if (!valid) {
-                event.preventDefault();
-            }
-        });
+        // Validate fields
+        validateField(
+            document.getElementById('plate-number'),
+            /^[0-9]+$/,
+            'Invalid plate number (numbers only)'
+        );
+
+        validateField(
+            document.getElementById('model-name'),
+            /^[a-zA-Z0-9 -]+$/,
+            'Invalid model name (alphanumeric and hyphens only)'
+        );
+
+        validateField(
+            document.getElementById('model-year'),
+            /^(19|20)\d{2}$/,
+            'Invalid model year (1900-2099)'
+        );
+
+        validateField(
+            document.getElementById('color'),
+            /^[a-zA-Z ]+$/,
+            'Invalid color (letters and spaces only)'
+        );
+
+        const priceField = document.getElementById('price');
+        if (priceField.value <= 0) {
+            priceField.classList.add('error-border');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = 'Price must be greater than 0';
+            priceField.parentNode.insertBefore(errorDiv, priceField.nextSibling);
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
     </script>
 </body>
 </html>
+<?php
+// Clear session errors after display
+if (isset($_SESSION['errors'])) {
+    unset($_SESSION['errors']);
+    unset($_SESSION['old_input']);
+}
+?>
