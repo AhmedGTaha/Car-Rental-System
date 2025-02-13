@@ -47,18 +47,34 @@ if (isset($_GET['id'])) {
             let endDate = document.getElementById('end-date').value;
             let pricePerDay = parseFloat(document.getElementById('price-day').value);
 
+            let today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+
             if (startDate && endDate) {
                 let start = new Date(startDate);
                 let end = new Date(endDate);
 
-                if (end > start) {
-                    let days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                    document.getElementById('rental-days').innerText = days + " days";
-                    document.getElementById('total-price').innerText = "BD " + (days * pricePerDay).toFixed(2);
-                } else {
+                // Check if the start date is in the past
+                if (start < new Date(today)) {
+                    alert("Start date cannot be in the past.");
+                    document.getElementById('start-date').value = ''; // Reset the input
                     document.getElementById('rental-days').innerText = "Invalid dates";
                     document.getElementById('total-price').innerText = "BD 0.00";
+                    return;
                 }
+
+                // Check if the start date is after the end date
+                if (end <= start) {
+                    alert("Return date must be after the pick-up date.");
+                    document.getElementById('end-date').value = ''; // Reset the input
+                    document.getElementById('rental-days').innerText = "Invalid dates";
+                    document.getElementById('total-price').innerText = "BD 0.00";
+                    return;
+                }
+
+                // Calculate rental days and total price
+                let days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                document.getElementById('rental-days').innerText = days + " days";
+                document.getElementById('total-price').innerText = "BD " + (days * pricePerDay).toFixed(2);
             }
         }
     </script>

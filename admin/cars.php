@@ -55,7 +55,7 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <p class="card-text">Year: <?php echo htmlspecialchars($car['model_year'])?></p>
                         <p class="card-text">Type: <?php echo htmlspecialchars($car['type'])?></p>
                         <p class="card-text">Transmission: <?php echo htmlspecialchars($car['transmission'])?></p>
-                        <p class="card-text">Price/Day: BD<?php echo htmlspecialchars($car['price_day'])?></p>
+                        <p class="card-text">Price per Day: BD<?php echo htmlspecialchars($car['price_day'])?></p>
                         <p class="card-text">Color: <?php echo htmlspecialchars($car['color'])?></p>
 
                         <span

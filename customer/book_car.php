@@ -16,28 +16,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $startDate = $_POST['start-date'];
     $endDate = $_POST['end-date'];
 
+    // Validate date selection
+    if (strtotime($endDate) <= strtotime($startDate)) {
+        die("Error: Return date must be after the pick-up date.");
+    }
+
     // Check if car is available for rent
     try {
-        $sql = "SELECT status FROM booking WHERE plate_No = :plateNo AND (start_date <= :startDate AND end_date >= :endDate)";
+        // Check if there are any bookings that overlap with the selected dates
+        $sql = "SELECT status, end_date FROM booking WHERE plate_No = :plateNo 
+                AND (start_date <= :endDate AND end_date >= :startDate)";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':plateNo', $plateNo, PDO::PARAM_STR);
         $stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
         $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
         $stmt->execute();
         $booking = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // If there is an overlapping booking, check if the start date is after the last booking's end date
         if ($booking) {
-            die("Error: Car is already booked for this period.");
+            // If the selected start date is later than the last booking's end date, allow booking
+            if (strtotime($startDate) > strtotime($booking['end_date'])) {
+                // Proceed with the booking
+            } else {
+                die("Error: Car is already booked for the selected period.");
+            }
         }
     } catch (PDOException $e) {
-        die("Database error: ". $e->getMessage());
+        die("Database error: " . $e->getMessage());
     }
 
-    // Validate date selection
-    if (strtotime($endDate) <= strtotime($startDate)) {
-        die("Error: Return date must be after the pick-up date.");
-    }
-
-    // Fetch car price per day
+    // Fetch car price per day and availability
     try {
         $sql = "SELECT price_day, status FROM car WHERE plate_No = :plateNo";
         $stmt = $pdo->prepare($sql);
@@ -49,14 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             die("Error: Car not found.");
         }
 
-        if ($car['status'] === "available") {
+        // Ignore the car's rented status if booking is not overlapping
+        if ($car['status'] === "available" || $car['status'] === "rented") {
             $pricePerDay = $car['price_day'];
             $days = (strtotime($endDate) - strtotime($startDate)) / (60 * 60 * 24);
             $totalCost = $days * $pricePerDay;
 
             // Insert booking into the database
             $sql = "INSERT INTO booking (user_email, plate_No, start_date, end_date, total_price) 
-                VALUES (:userEmail, :plateNo, :startDate, :endDate, :totalCost)";
+                    VALUES (:userEmail, :plateNo, :startDate, :endDate, :totalCost)";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':userEmail', $userEmail, PDO::PARAM_STR);
             $stmt->bindParam(':plateNo', $plateNo, PDO::PARAM_STR);
@@ -65,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindParam(':totalCost', $totalCost, PDO::PARAM_STR);
             $stmt->execute();
 
-            // change booking status to 'confirmed'
+            // Change booking status to 'confirmed'
             $sql = "UPDATE booking SET status = 'confirmed' WHERE plate_No = :plateNo AND start_date = :startDate AND end_date = :endDate";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':plateNo', $plateNo, PDO::PARAM_STR);
@@ -83,16 +93,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
 
             // Update car status to 'rented'
-            $sql = "UPDATE car SET status ='rented' WHERE plate_No = :plateNo";
+            $sql = "UPDATE car SET status = 'rented' WHERE plate_No = :plateNo";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':plateNo', $plateNo, PDO::PARAM_STR);
             $stmt->execute();
 
             header("Location: browse.php?success=1");
-
             exit();
-        }
-        else {
+        } else {
             echo "<script>alert('Car is not available for rent.')</script>";
             header("Location: browse.php");
             exit();
