@@ -110,8 +110,8 @@ nav svg{
             </label>
 
             <a href="home.php">Home</a>
-            <a href="profile.php">Edit Profile</a>
             <a href="browse.php">Browse Cars</a>
+            <a href="profile.php">Edit Profile</a>
 
         </div>
     </nav>

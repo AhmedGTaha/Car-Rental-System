@@ -2,7 +2,7 @@ CREATE DATABASE CarRentalSystem;
 USE CarRentalSystem;
 
 -- User Table
-CREATE TABLE User (
+CREATE TABLE user (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -13,7 +13,7 @@ CREATE TABLE User (
 );
 
 -- Car Table
-CREATE TABLE Car (
+CREATE TABLE car (
     plate_No VARCHAR(20) PRIMARY KEY,
     model_name VARCHAR(50) NOT NULL,
     model_year VARCHAR(20) NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE Car (
 );
 
 -- Booking Table
-CREATE TABLE Booking (
+CREATE TABLE booking (
     booking_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     user_email VARCHAR(255) NOT NULL,

@@ -1,19 +1,25 @@
 <?php
 session_start();
-if (isset($_SESSION['user_email'])) {
-    header("Location: customer/home.php");
-    exit();
+if (isset($_SESSION['user_email']) && isset($_SESSION['user_role'])) {
+    if ($_SESSION['user_role'] == 'customer') {
+        header("Location: customer/home.php");
+        exit();
+    } elseif ($_SESSION['user_role'] == 'admin') {
+        header("Location: admin/admin_dashboard.php");
+        exit();
+    }
 }
 
-$errorMessage = isset($_SESSION['error']) ? $_SESSION['error'] : null;
+$errorMessage = $_SESSION['error'] ?? ''; // Default to empty string
 unset($_SESSION['error']); // Remove error after storing it
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Login Page</title>
     <style>
         .error {
@@ -33,17 +39,19 @@ unset($_SESSION['error']); // Remove error after storing it
                     <h3 class="card-title mb-3 text-center">Login</h3>
                     <form action="login_process.php" method="post" id="login-form">
                         
-                        <?php if ($errorMessage): ?>
-                            <p class="error-message"><?php echo $errorMessage; ?></p>
+                        <?php if (!empty($errorMessage)): ?>
+                            <p class="error-message"><?php echo htmlspecialchars($errorMessage); ?></p>
                         <?php endif; ?>
                         
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="email" placeholder="name@example.com" name="email" required>
+                            <input type="email" class="form-control <?php echo !empty($errorMessage) ? 'error' : ''; ?>" 
+                                   id="email" placeholder="name@example.com" name="email" required>
                             <label for="email">Email address</label>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" id="password" placeholder="Password" name="password" required>
+                            <input type="password" class="form-control <?php echo !empty($errorMessage) ? 'error' : ''; ?>" 
+                                   id="password" placeholder="Password" name="password" required>
                             <label for="password">Password</label>
                         </div>
 
@@ -58,20 +66,5 @@ unset($_SESSION['error']); // Remove error after storing it
         </div>
     </div>
 </div>
-
-<?php if ($errorMessage): ?>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        function validateField(id) {
-            const field = document.getElementById(id);
-            if (field) {
-                field.classList.add('error');
-            }
-        }
-        validateField('email');
-        validateField('password');
-    });
-</script>
-<?php endif; ?>
 </body>
 </html>

@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $type = trim($_POST['type']);
     $transmission = trim($_POST['transmission']);
     $price_day = trim($_POST['price']);
-    $status = trim($_POST['status']);
+    $status = "available";
     $color = trim($_POST['color']);
 
     // Validate plate number
@@ -154,7 +154,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 
                 <?php if (isset($_SESSION['errors']['database'])): ?>
                     <div class="alert alert-danger">
-                        <?= htmlspecialchars($_SESSION['errors']['database']) ?>
+                        <?php echo htmlspecialchars($_SESSION['errors']['database']); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (isset($errors['image'])): ?>
+                    <div class="alert alert-danger">
+                        <?php echo htmlspecialchars($errors['image']); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (isset($errors['plate-number'])):?>
+                    <div class="alert alert-danger">
+                        <?php echo htmlspecialchars($errors['plate-number']); ?>
                     </div>
                 <?php endif; ?>
 
@@ -217,15 +229,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <?php if (isset($_SESSION['errors']['price'])): ?>
                             <div class="error-message"><?= $_SESSION['errors']['price'] ?></div>
                         <?php endif; ?>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="status" class="form-label">Status</label>
-                        <select class="form-select" id="status" name="status" required>
-                            <?php $oldStatus = $_SESSION['old_input']['status'] ?? 'available'; ?>
-                            <option value="available" <?= $oldStatus === 'available' ? 'selected' : '' ?>>Available</option>
-                            <option value="rented" <?= $oldStatus === 'rented' ? 'selected' : '' ?>>Rented</option>
-                        </select>
                     </div>
 
                     <div class="mb-3">
