@@ -24,5 +24,6 @@ include('../cleanup_bookings.php');
             </div>
         </header>
     </div>
+    <?php include('my_bookings.php');?>
 </body>
 </html>

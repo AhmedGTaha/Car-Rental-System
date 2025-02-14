@@ -25,6 +25,15 @@ if (isset($_GET['id'])) {
             header("Location: browse.php");
             exit();
         }
+
+        // Get the end date of the rental car
+        if ($car['status'] === 'rented') {
+            $sql_booking = "SELECT end_date FROM booking WHERE plate_No = :plateNo";
+            $stmt_booking = $pdo->prepare($sql_booking);
+            $stmt_booking->bindParam(':plateNo', $plateNo, PDO::PARAM_STR);
+            $stmt_booking->execute();
+            $end_dates = $stmt_booking->fetch(PDO::FETCH_ASSOC);
+        }
     } catch (PDOException $e) {
         die("Database error: " . $e->getMessage());
     }
@@ -105,6 +114,14 @@ if (isset($_GET['id'])) {
                         <label>Return Date</label>
                         <input type="date" id="end-date" name="end-date" class="form-control" required onchange="updatePrice()">
                     </div>
+                    <?php if ($car['status'] === 'rented') {
+                        if ($end_dates) { ?>
+
+                            <div class="alert alert-warning">
+                                Car is already rented this car on <strong><?php echo htmlspecialchars($end_dates['end_date']) ?></strong>. Please choose a different date before booking.
+                            </div>
+                        <?php } ?>
+                    <?php } ?>
                     <p>Rental Period: <span id="rental-days">0 days</span></p>
                     <p>Total: <span id="total-price">BD 0.00</span></p>
                     <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want this car?');">Rent Car</button>
