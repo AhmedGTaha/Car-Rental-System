@@ -2,6 +2,7 @@
 session_start();
 include('../db_con.php');
 include('../nav.php');
+include('../cleanup_bookings.php');
 
 // Fetch all types and transmissions and statuses and model years and prices and colors from the database
 $types_sql = "SELECT DISTINCT type FROM Car";

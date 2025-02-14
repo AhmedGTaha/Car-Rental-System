@@ -2,6 +2,7 @@
 session_start();
 include ('../db_con.php');
 include ('nav_bar.php');
+include('../cleanup_bookings.php');
 
 try {
 // Fetch all users from the database

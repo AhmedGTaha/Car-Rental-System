@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_name'] = $user['username'];
             $_SESSION['user_pic'] = $user['profile_image'];
             $_SESSION['user_role'] = $user['role'];
+            include('../cleanup_bookings.php');
 
             $redirect_url = ($user['role'] == 'admin') ? 'admin/admin_dashboard.php' : 'customer/home.php';
             header("Location: $redirect_url");

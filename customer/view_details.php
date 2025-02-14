@@ -2,6 +2,7 @@
 session_start();
 include('../db_con.php');
 include('../nav.php');
+include('../cleanup_bookings.php');
 
 // Check if user is logged in
 if (!isset($_SESSION['user_email'])) {
