@@ -78,6 +78,12 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Cars</title>
     <style>
+        header {
+            margin-bottom: 15px;
+        }
+        main {
+            padding-bottom: 30px;
+        }
         .card {
             border: 1px solid #ddd;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -100,125 +106,132 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <div class="container mt-5">
-        <header class="text-center mb-4">
-            <h1 class="display-4">Browse Cars</h1>
-            <p class="lead">Explore our selection of available rental cars and make your booking today!</p>
-        </header>
+<body class="d-flex flex-column min-vh-100">
+    <main class="flex-grow-1">
 
-        <div class="container filter-container mb-4">
-            <h3 class="text-center mb-3">Narrow Your Research</h3>
-            <form method="GET" class="d-flex flex-wrap gap-3 align-items-end justify-content-center">
-                <div class="col-auto">
-                    <label class="form-label">Type</label>
-                    <select class="form-select" name="type">
-                        <option value="">All</option>
-                        <?php foreach ($types as $type): ?>
+        <div class="container mt-5">
+            <header class="text-center mb-4">
+                <h1 class="display-4">Browse Cars</h1>
+                <p class="lead">Explore our selection of available rental cars and make your booking today!</p>
+            </header>
+
+            <div class="container filter-container mb-4">
+                <h3 class="text-center mb-3">Narrow Your Research</h3>
+                <form method="GET" class="d-flex flex-wrap gap-3 align-items-end justify-content-center">
+                    <div class="col-auto">
+                        <label class="form-label">Type</label>
+                        <select class="form-select" name="type">
+                            <option value="">All</option>
+                            <?php foreach ($types as $type): ?>
                             <option value="<?= htmlspecialchars($type) ?>"
                                 <?= (isset($_GET['type']) && $_GET['type'] == $type) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars(ucfirst($type)) ?>
                             </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <label class="form-label">Transmission</label>
-                    <select class="form-select" name="transmission">
-                        <option value="">All</option>
-                        <?php foreach ($transmissions as $transmission): ?>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label class="form-label">Transmission</label>
+                        <select class="form-select" name="transmission">
+                            <option value="">All</option>
+                            <?php foreach ($transmissions as $transmission): ?>
                             <option value="<?= htmlspecialchars($transmission) ?>"
                                 <?= (isset($_GET['transmission']) && $_GET['transmission'] == $transmission) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars(ucfirst($transmission)) ?>
                             </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <label class="form-label">Status</label>
-                    <select class="form-select" name="status">
-                        <option value="">All</option>
-                        <?php foreach ($statuses as $status): ?>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="status">
+                            <option value="">All</option>
+                            <?php foreach ($statuses as $status): ?>
                             <option value="<?= htmlspecialchars($status) ?>"
                                 <?= (isset($_GET['status']) && $_GET['status'] == $status) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars(ucfirst($status)) ?>
                             </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <label class="form-label">Year</label>
-                    <select class="form-select" name="year">
-                        <option value="">All</option>
-                        <?php foreach ($years as $year): ?>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label class="form-label">Year</label>
+                        <select class="form-select" name="year">
+                            <option value="">All</option>
+                            <?php foreach ($years as $year): ?>
                             <option value="<?= htmlspecialchars($year) ?>"
                                 <?= (isset($_GET['year']) && $_GET['year'] == $year) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($year) ?>
                             </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <label class="form-label">Price/Day</label>
-                    <select class="form-select" name="price">
-                        <option value="">All</option>
-                        <?php foreach ($prices as $price): ?>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label class="form-label">Price/Day</label>
+                        <select class="form-select" name="price">
+                            <option value="">All</option>
+                            <?php foreach ($prices as $price): ?>
                             <option value="<?= htmlspecialchars($price) ?>"
                                 <?= (isset($_GET['price']) && $_GET['price'] == $price) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($price) ?> BD
                             </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <label class="form-label">Color</label>
-                    <select class="form-select" name="color">
-                        <option value="">All</option>
-                        <?php foreach ($colors as $color): ?>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label class="form-label">Color</label>
+                        <select class="form-select" name="color">
+                            <option value="">All</option>
+                            <?php foreach ($colors as $color): ?>
                             <option value="<?= htmlspecialchars($color) ?>"
                                 <?= (isset($_GET['color']) && $_GET['color'] == $color) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars(ucfirst($color)) ?>
                             </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-outline-dark">Filter</button>
-                </div>
-            </form>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-outline-dark">Filter</button>
+                    </div>
+                </form>
 
-        </div>
+            </div>
 
-        <!-- Car Listings -->
-        <div class="row mt-4">
-            <!-- Display cars -->
-            <?php if ($cars): ?>
+            <!-- Car Listings -->
+            <div class="row mt-4">
+                <!-- Display cars -->
+                <?php if ($cars): ?>
                 <div class="row row-cols-1 row-cols-md-3 g-4">
                     <?php foreach ($cars as $car): ?>
-                        <div class="col">
-                            <div class="card user-card">
-                                <img src="<?= htmlspecialchars($car['car_image']) ?>" class="card-img-top" alt="Car Image">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title"><?= htmlspecialchars($car['model_name']) ?> (<?= htmlspecialchars($car['model_year']) ?>)</h5>
-                                    <p class="card-text">Plate No: <?= htmlspecialchars($car['plate_No']) ?></p>
-                                    <p class="card-text">Type: <?= htmlspecialchars($car['type']) ?></p>
-                                    <p class="card-text">Transmission: <?= htmlspecialchars($car['transmission']) ?></p>
-                                    <p class="card-text">Price Per Day: BD<?= number_format($car['price_day'], 2) ?></p>
-                                    <p class="card-text">Color: <?php echo htmlspecialchars($car['color']) ?></p>
-                                    <p class="card-text">Status: <strong><?= ucfirst(htmlspecialchars($car['status'])) ?></strong></p>
-                                    <a href="view_details.php?id=<?php echo $car['plate_No']; ?>" class="btn btn-sm btn-outline-dark btn-cancel">
-                                        View Details
-                                    </a>
-                                </div>
+                    <div class="col">
+                        <div class="card user-card">
+                            <img src="<?= htmlspecialchars($car['car_image']) ?>" class="card-img-top" alt="Car Image">
+                            <div class="card-body text-center">
+                                <h5 class="card-title"><?= htmlspecialchars($car['model_name']) ?>
+                                    (<?= htmlspecialchars($car['model_year']) ?>)</h5>
+                                <p class="card-text">Plate No: <?= htmlspecialchars($car['plate_No']) ?></p>
+                                <p class="card-text">Type: <?= htmlspecialchars($car['type']) ?></p>
+                                <p class="card-text">Transmission: <?= htmlspecialchars($car['transmission']) ?></p>
+                                <p class="card-text">Price Per Day: BD<?= number_format($car['price_day'], 2) ?></p>
+                                <p class="card-text">Color: <?php echo htmlspecialchars($car['color']) ?></p>
+                                <p class="card-text">Status:
+                                    <strong><?= ucfirst(htmlspecialchars($car['status'])) ?></strong></p>
+                                <a href="view_details.php?id=<?php echo $car['plate_No']; ?>"
+                                    class="btn btn-sm btn-outline-dark btn-cancel">
+                                    View Details
+                                </a>
                             </div>
                         </div>
+                    </div>
                     <?php endforeach; ?>
                 </div>
-            <?php else: ?>
+                <?php else: ?>
                 <p class="text-center">No Cars found.</p>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
         </div>
-    </div>
+    </main>
+    <?php include('../footer.php'); ?>
 </body>
 
 </html>

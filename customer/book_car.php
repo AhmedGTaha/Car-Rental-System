@@ -98,11 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindParam(':plateNo', $plateNo, PDO::PARAM_STR);
             $stmt->execute();
 
-            header("Location: browse.php?success=1");
+            header("Location: home.php?success=1");
             exit();
         } else {
             echo "<script>alert('Car is not available for rent.')</script>";
-            header("Location: browse.php");
+            header("Location: home.php");
             exit();
         }
     } catch (PDOException $e) {

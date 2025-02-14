@@ -51,18 +51,23 @@ if (isset($_GET['id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Rental - Booking</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        header {
+            margin-bottom: 15px;
+        }
+        main {
+            padding-bottom: 15px;
+        }
+    </style>
     <script>
         function updatePrice() {
             let startDate = document.getElementById('start-date').value;
             let endDate = document.getElementById('end-date').value;
             let pricePerDay = parseFloat(document.getElementById('price-day').value);
-
             let today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-
             if (startDate && endDate) {
                 let start = new Date(startDate);
                 let end = new Date(endDate);
-
                 // Check if the start date is in the past
                 if (start < new Date(today)) {
                     alert("Start date cannot be in the past.");
@@ -71,7 +76,6 @@ if (isset($_GET['id'])) {
                     document.getElementById('total-price').innerText = "BD 0.00";
                     return;
                 }
-
                 // Check if the start date is after the end date
                 if (end <= start) {
                     alert("Return date must be after the pick-up date.");
@@ -80,7 +84,6 @@ if (isset($_GET['id'])) {
                     document.getElementById('total-price').innerText = "BD 0.00";
                     return;
                 }
-
                 // Calculate rental days and total price
                 let days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
                 document.getElementById('rental-days').innerText = days + " days";
@@ -90,45 +93,60 @@ if (isset($_GET['id'])) {
     </script>
 </head>
 
-<body>
-    <div class="container py-5">
-        <h1 class="text-center">Complete Your Booking</h1>
-        <div class="row">
-            <div class="col-md-8">
-                <img src="<?php echo htmlspecialchars($car['car_image']) ?>" class="img-fluid">
-                <h2><?php echo htmlspecialchars($car['model_year']) . ' ' . htmlspecialchars($car['model_name']) ?></h2>
-                <p>Plate No: <?php echo htmlspecialchars($car['plate_No']) ?></p>
-                <p>Type: <?php echo htmlspecialchars($car['type']) ?></p>
-                <p>Color: <?php echo htmlspecialchars($car['color']) ?></p>
-                <p>Transmission: <?php echo htmlspecialchars($car['transmission']) ?></p>
-            </div>
-            <div class="col-md-4">
-                <form action="book_car.php" method="POST">
-                    <input type="hidden" id="price-day" value="<?php echo htmlspecialchars($car['price_day']) ?>">
-                    <input type="hidden" name="plate_No" value="<?php echo htmlspecialchars($car['plate_No']) ?>"> <!-- Add this line -->
-                    <div>
-                        <label>Pick-up Date</label>
-                        <input type="date" id="start-date" name="start-date" class="form-control" required onchange="updatePrice()">
-                    </div>
-                    <div>
-                        <label>Return Date</label>
-                        <input type="date" id="end-date" name="end-date" class="form-control" required onchange="updatePrice()">
-                    </div>
-                    <?php if ($car['status'] === 'rented') {
-                        if ($end_dates) { ?>
+<body class="d-flex flex-column min-vh-100">
+    <main class="flex-grow-1">
 
-                            <div class="alert alert-warning">
-                                Car is already rented this car on <strong><?php echo htmlspecialchars($end_dates['end_date']) ?></strong>. Please choose a different date before booking.
-                            </div>
+        <div class="container py-5">
+            <header class="text-center mb-4">
+                <h1 class="display-4">Complete Your Booking</h1>
+            </header>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <img src="<?php echo htmlspecialchars($car['car_image']) ?>" class="img-fluid">
+                    <h2><?php echo htmlspecialchars($car['model_year']) . ' ' . htmlspecialchars($car['model_name']) ?>
+                    </h2>
+                    <p>Plate No: <?php echo htmlspecialchars($car['plate_No']) ?></p>
+                    <p>Type: <?php echo htmlspecialchars($car['type']) ?></p>
+                    <p>Color: <?php echo htmlspecialchars($car['color']) ?></p>
+                    <p>Transmission: <?php echo htmlspecialchars($car['transmission']) ?></p>
+                </div>
+                <div class="col-md-4">
+                    <form action="book_car.php" method="POST">
+                        <input type="hidden" id="price-day" value="<?php echo htmlspecialchars($car['price_day']) ?>">
+                        <input type="hidden" name="plate_No" value="<?php echo htmlspecialchars($car['plate_No']) ?>">
+                        <!-- Add this line -->
+                        <div>
+                            <label>Pick-up Date</label>
+                            <input type="date" id="start-date" name="start-date" class="form-control" required
+                                onchange="updatePrice()">
+                        </div>
+                        <div>
+                            <label>Return Date</label>
+                            <input type="date" id="end-date" name="end-date" class="form-control" required
+                                onchange="updatePrice()">
+                        </div>
+                        <?php if ($car['status'] === 'rented') {
+                            if ($end_dates) { ?>
+
+                                <div class="alert alert-warning" style="margin-top:15px;">
+                                    Car is already rented on
+                                    <strong><?php echo htmlspecialchars($end_dates['end_date']) ?></strong>. Please choose a
+                                    different date before booking.
+                                </div>
+                            <?php } ?>
                         <?php } ?>
-                    <?php } ?>
-                    <p>Rental Period: <span id="rental-days">0 days</span></p>
-                    <p>Total: <span id="total-price">BD 0.00</span></p>
-                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want this car?');">Rent Car</button>
-                </form>
+                        <p>Rental Period: <span id="rental-days">0 days</span></p>
+                        <p>Total: <span id="total-price">BD 0.00</span></p>
+                        <button type="submit" class="btn btn-success"
+                            onclick="return confirm('Are you sure you want this car?');">Rent Car</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
+    <?php include('../footer.php'); ?>
+
 </body>
 
 </html>

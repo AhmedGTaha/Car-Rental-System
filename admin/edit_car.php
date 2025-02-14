@@ -145,174 +145,201 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Edit Car</title>
     <style>
-        .error-border { border: 2px solid #dc3545 !important; }
-        .error-message { color: #dc3545; font-size: 0.875em; margin-top: 0.25rem; }
+        header {
+            margin-bottom: 15px;
+        }
+
+        main {
+            padding-bottom: 15px;
+        }
+
+        .error-border {
+            border: 2px solid #dc3545 !important;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
-<body>    
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">Car Management</h1>
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h3 class="mb-3">Edit Car Details</h3>
 
-                <?php if (isset($_SESSION['errors']['database'])): ?>
+<body class="d-flex flex-column min-vh-100">
+    <main class="flex-grow-1">
+
+        <div class="container mt-4">
+            <header class="text-center mb-4">
+                <h1 class="display-4">Car Management</h1>
+            </header>
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="mb-3">Edit Car Details</h3>
+
+                    <?php if (isset($_SESSION['errors']['database'])): ?>
                     <div class="alert alert-danger">
                         <?= htmlspecialchars($_SESSION['errors']['database']) ?>
                     </div>
-                <?php endif; ?>
+                    <?php endif; ?>
 
-                <form method="POST" enctype="multipart/form-data" action="edit_car.php?id=<?= $plateNo ?>" id="edit-car">
-                    <div class="mb-3">
-                        <label class="form-label">Model Name</label>
-                        <input type="text" class="form-control <?= isset($_SESSION['errors']['model-name']) ? 'error-border' : '' ?>" 
-                               name="model-name" 
-                               value="<?= htmlspecialchars($_SESSION['old_input']['model-name'] ?? $car['model_name']) ?>">
-                        <?php if (isset($_SESSION['errors']['model-name'])): ?>
+                    <form method="POST" enctype="multipart/form-data" action="edit_car.php?id=<?= $plateNo ?>"
+                        id="edit-car">
+                        <div class="mb-3">
+                            <label class="form-label">Model Name</label>
+                            <input type="text"
+                                class="form-control <?= isset($_SESSION['errors']['model-name']) ? 'error-border' : '' ?>"
+                                name="model-name"
+                                value="<?= htmlspecialchars($_SESSION['old_input']['model-name'] ?? $car['model_name']) ?>">
+                            <?php if (isset($_SESSION['errors']['model-name'])): ?>
                             <div class="error-message"><?= $_SESSION['errors']['model-name'] ?></div>
-                        <?php endif; ?>
-                    </div>
+                            <?php endif; ?>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Model Year</label>
-                        <input type="number" class="form-control <?= isset($_SESSION['errors']['model-year']) ? 'error-border' : '' ?>" 
-                               name="model-year" 
-                               value="<?= htmlspecialchars($_SESSION['old_input']['model-year'] ?? $car['model_year']) ?>">
-                        <?php if (isset($_SESSION['errors']['model-year'])): ?>
+                        <div class="mb-3">
+                            <label class="form-label">Model Year</label>
+                            <input type="number"
+                                class="form-control <?= isset($_SESSION['errors']['model-year']) ? 'error-border' : '' ?>"
+                                name="model-year"
+                                value="<?= htmlspecialchars($_SESSION['old_input']['model-year'] ?? $car['model_year']) ?>">
+                            <?php if (isset($_SESSION['errors']['model-year'])): ?>
                             <div class="error-message"><?= $_SESSION['errors']['model-year'] ?></div>
-                        <?php endif; ?>
-                    </div>
+                            <?php endif; ?>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Type</label>
-                        <select class="form-select" name="type">
-                            <?php $currentType = $_SESSION['old_input']['type'] ?? $car['type']; ?>
-                            <option value="sedan" <?= $currentType === 'sedan' ? 'selected' : '' ?>>Sedan</option>
-                            <option value="SUV" <?= $currentType === 'SUV' ? 'selected' : '' ?>>SUV</option>
-                            <option value="sport" <?= $currentType === 'sport' ? 'selected' : '' ?>>Sport</option>
-                            <option value="pickup" <?= $currentType === 'pickup' ? 'selected' : '' ?>>Pickup</option>
-                        </select>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="type">
+                                <?php $currentType = $_SESSION['old_input']['type'] ?? $car['type']; ?>
+                                <option value="sedan" <?= $currentType === 'sedan' ? 'selected' : '' ?>>Sedan</option>
+                                <option value="SUV" <?= $currentType === 'SUV' ? 'selected' : '' ?>>SUV</option>
+                                <option value="sport" <?= $currentType === 'sport' ? 'selected' : '' ?>>Sport</option>
+                                <option value="pickup" <?= $currentType === 'pickup' ? 'selected' : '' ?>>Pickup
+                                </option>
+                            </select>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Transmission</label>
-                        <select class="form-select" name="transmission">
-                            <?php $currentTrans = $_SESSION['old_input']['transmission'] ?? $car['transmission']; ?>
-                            <option value="automatic" <?= $currentTrans === 'automatic' ? 'selected' : '' ?>>Automatic</option>
-                            <option value="manual" <?= $currentTrans === 'manual' ? 'selected' : '' ?>>Manual</option>
-                        </select>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">Transmission</label>
+                            <select class="form-select" name="transmission">
+                                <?php $currentTrans = $_SESSION['old_input']['transmission'] ?? $car['transmission']; ?>
+                                <option value="automatic" <?= $currentTrans === 'automatic' ? 'selected' : '' ?>>
+                                    Automatic</option>
+                                <option value="manual" <?= $currentTrans === 'manual' ? 'selected' : '' ?>>Manual
+                                </option>
+                            </select>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Price per Day</label>
-                        <input type="number" step="0.01" class="form-control <?= isset($_SESSION['errors']['price']) ? 'error-border' : '' ?>" 
-                               name="price" 
-                               value="<?= htmlspecialchars($_SESSION['old_input']['price'] ?? $car['price_day']) ?>">
-                        <?php if (isset($_SESSION['errors']['price'])): ?>
+                        <div class="mb-3">
+                            <label class="form-label">Price per Day</label>
+                            <input type="number" step="0.01"
+                                class="form-control <?= isset($_SESSION['errors']['price']) ? 'error-border' : '' ?>"
+                                name="price"
+                                value="<?= htmlspecialchars($_SESSION['old_input']['price'] ?? $car['price_day']) ?>">
+                            <?php if (isset($_SESSION['errors']['price'])): ?>
                             <div class="error-message"><?= $_SESSION['errors']['price'] ?></div>
-                        <?php endif; ?>
-                    </div>
+                            <?php endif; ?>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Color</label>
-                        <input type="text" class="form-control <?= isset($_SESSION['errors']['color']) ? 'error-border' : '' ?>" 
-                               name="color" 
-                               value="<?= htmlspecialchars($_SESSION['old_input']['color'] ?? $car['color']) ?>">
-                        <?php if (isset($_SESSION['errors']['color'])): ?>
+                        <div class="mb-3">
+                            <label class="form-label">Color</label>
+                            <input type="text"
+                                class="form-control <?= isset($_SESSION['errors']['color']) ? 'error-border' : '' ?>"
+                                name="color"
+                                value="<?= htmlspecialchars($_SESSION['old_input']['color'] ?? $car['color']) ?>">
+                            <?php if (isset($_SESSION['errors']['color'])): ?>
                             <div class="error-message"><?= $_SESSION['errors']['color'] ?></div>
-                        <?php endif; ?>
-                    </div>
+                            <?php endif; ?>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Car Image (Optional)</label>
-                        <input type="file" class="form-control <?= isset($_SESSION['errors']['car_image']) ? 'error-border' : '' ?>" 
-                               name="car_image">
-                        <?php if (isset($_SESSION['errors']['car_image'])): ?>
+                        <div class="mb-3">
+                            <label class="form-label">Car Image (Optional)</label>
+                            <input type="file"
+                                class="form-control <?= isset($_SESSION['errors']['car_image']) ? 'error-border' : '' ?>"
+                                name="car_image">
+                            <?php if (isset($_SESSION['errors']['car_image'])): ?>
                             <div class="error-message"><?= $_SESSION['errors']['car_image'] ?></div>
-                        <?php endif; ?>
-                        <?php if (!empty($car['car_image'])): ?>
+                            <?php endif; ?>
+                            <?php if (!empty($car['car_image'])): ?>
                             <div class="mt-2">
                                 <p>Current Image:</p>
                                 <img src="<?= $car['car_image'] ?>" alt="Car Image" width="100" class="img-thumbnail">
                             </div>
-                        <?php endif; ?>
-                    </div>
+                            <?php endif; ?>
+                        </div>
 
-                    <button type="submit" class="btn btn-outline-primary">Update Car</button>
-                    <a href="cars.php" class="btn btn-outline-secondary">Cancel</a>
-                </form>
+                        <button type="submit" class="btn btn-outline-primary">Update Car</button>
+                        <a href="cars.php" class="btn btn-outline-secondary">Cancel</a>
+                    </form>
+                </div>
             </div>
-        </div>   
-    </div>
+        </div>
 
-    <script>
-    document.getElementById('edit-car').addEventListener('submit', function(e) {
-        let isValid = true;
-        
-        function validateField(field, regex, errorMessage) {
-            const errorDiv = field.nextElementSibling;
-            if (!regex.test(field.value.trim())) {
-                field.classList.add('error-border');
-                if (!errorDiv || !errorDiv.classList.contains('error-message')) {
-                    const newError = document.createElement('div');
-                    newError.className = 'error-message';
-                    newError.textContent = errorMessage;
-                    field.parentNode.insertBefore(newError, field.nextSibling);
+        <script>
+            document.getElementById('edit-car').addEventListener('submit', function(e) {
+                let isValid = true;
+
+                function validateField(field, regex, errorMessage) {
+                    const errorDiv = field.nextElementSibling;
+                    if (!regex.test(field.value.trim())) {
+                        field.classList.add('error-border');
+                        if (!errorDiv || !errorDiv.classList.contains('error-message')) {
+                            const newError = document.createElement('div');
+                            newError.className = 'error-message';
+                            newError.textContent = errorMessage;
+                            field.parentNode.insertBefore(newError, field.nextSibling);
+                        }
+                        isValid = false;
+                    } else {
+                        field.classList.remove('error-border');
+                        if (errorDiv && errorDiv.classList.contains('error-message')) {
+                            errorDiv.remove();
+                        }
+                    }
                 }
-                isValid = false;
-            } else {
-                field.classList.remove('error-border');
-                if (errorDiv && errorDiv.classList.contains('error-message')) {
-                    errorDiv.remove();
+                // Clear previous errors
+                document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
+                document.querySelectorAll('.error-message').forEach(el => el.remove());
+                // Validate fields
+                validateField(
+                    document.querySelector('[name="model-name"]'),
+                    /^[a-zA-Z0-9 -]+$/,
+                    'Invalid model name (alphanumeric and hyphens only)'
+                );
+                validateField(
+                    document.querySelector('[name="model-year"]'),
+                    /^(19|20)\d{2}$/,
+                    'Invalid model year (1900-2099)'
+                );
+                validateField(
+                    document.querySelector('[name="color"]'),
+                    /^[a-zA-Z ]+$/,
+                    'Invalid color (letters and spaces only)'
+                );
+                const priceField = document.querySelector('[name="price"]');
+                if (priceField.value <= 0) {
+                    priceField.classList.add('error-border');
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error-message';
+                    errorDiv.textContent = 'Price must be greater than 0';
+                    priceField.parentNode.insertBefore(errorDiv, priceField.nextSibling);
+                    isValid = false;
                 }
-            }
-        }
-
-        // Clear previous errors
-        document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
-        document.querySelectorAll('.error-message').forEach(el => el.remove());
-
-        // Validate fields
-        validateField(
-            document.querySelector('[name="model-name"]'),
-            /^[a-zA-Z0-9 -]+$/,
-            'Invalid model name (alphanumeric and hyphens only)'
-        );
-
-        validateField(
-            document.querySelector('[name="model-year"]'),
-            /^(19|20)\d{2}$/,
-            'Invalid model year (1900-2099)'
-        );
-
-        validateField(
-            document.querySelector('[name="color"]'),
-            /^[a-zA-Z ]+$/,
-            'Invalid color (letters and spaces only)'
-        );
-
-        const priceField = document.querySelector('[name="price"]');
-        if (priceField.value <= 0) {
-            priceField.classList.add('error-border');
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.textContent = 'Price must be greater than 0';
-            priceField.parentNode.insertBefore(errorDiv, priceField.nextSibling);
-            isValid = false;
-        }
-
-        if (!isValid) {
-            e.preventDefault();
-        }
-    });
-    </script>
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        </script>
+    </main>
+    <?php include('../footer.php'); ?>
 </body>
+
 </html>
 <?php
 // Clear session errors after display
