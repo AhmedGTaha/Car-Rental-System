@@ -63,12 +63,12 @@ if (!empty($_GET['color'])) {
 }
 
 $sql = "SELECT * FROM Car";
-    if ($conditions) {
-        $sql .= " WHERE " . implode(" AND ", $conditions);
-    }
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+if ($conditions) {
+    $sql .= " WHERE " . implode(" AND ", $conditions);
+}
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -115,10 +115,10 @@ $sql = "SELECT * FROM Car";
                     <select class="form-select" name="type">
                         <option value="">All</option>
                         <?php foreach ($types as $type): ?>
-                        <option value="<?= htmlspecialchars($type) ?>"
-                            <?= (isset($_GET['type']) && $_GET['type'] == $type) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars(ucfirst($type)) ?>
-                        </option>
+                            <option value="<?= htmlspecialchars($type) ?>"
+                                <?= (isset($_GET['type']) && $_GET['type'] == $type) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars(ucfirst($type)) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -127,10 +127,10 @@ $sql = "SELECT * FROM Car";
                     <select class="form-select" name="transmission">
                         <option value="">All</option>
                         <?php foreach ($transmissions as $transmission): ?>
-                        <option value="<?= htmlspecialchars($transmission) ?>"
-                            <?= (isset($_GET['transmission']) && $_GET['transmission'] == $transmission) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars(ucfirst($transmission)) ?>
-                        </option>
+                            <option value="<?= htmlspecialchars($transmission) ?>"
+                                <?= (isset($_GET['transmission']) && $_GET['transmission'] == $transmission) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars(ucfirst($transmission)) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -139,10 +139,10 @@ $sql = "SELECT * FROM Car";
                     <select class="form-select" name="status">
                         <option value="">All</option>
                         <?php foreach ($statuses as $status): ?>
-                        <option value="<?= htmlspecialchars($status) ?>"
-                            <?= (isset($_GET['status']) && $_GET['status'] == $status) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars(ucfirst($status)) ?>
-                        </option>
+                            <option value="<?= htmlspecialchars($status) ?>"
+                                <?= (isset($_GET['status']) && $_GET['status'] == $status) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars(ucfirst($status)) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -151,10 +151,10 @@ $sql = "SELECT * FROM Car";
                     <select class="form-select" name="year">
                         <option value="">All</option>
                         <?php foreach ($years as $year): ?>
-                        <option value="<?= htmlspecialchars($year) ?>"
-                            <?= (isset($_GET['year']) && $_GET['year'] == $year) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($year) ?>
-                        </option>
+                            <option value="<?= htmlspecialchars($year) ?>"
+                                <?= (isset($_GET['year']) && $_GET['year'] == $year) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($year) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -163,10 +163,10 @@ $sql = "SELECT * FROM Car";
                     <select class="form-select" name="price">
                         <option value="">All</option>
                         <?php foreach ($prices as $price): ?>
-                        <option value="<?= htmlspecialchars($price) ?>"
-                            <?= (isset($_GET['price']) && $_GET['price'] == $price) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($price) ?> BD
-                        </option>
+                            <option value="<?= htmlspecialchars($price) ?>"
+                                <?= (isset($_GET['price']) && $_GET['price'] == $price) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($price) ?> BD
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -175,10 +175,10 @@ $sql = "SELECT * FROM Car";
                     <select class="form-select" name="color">
                         <option value="">All</option>
                         <?php foreach ($colors as $color): ?>
-                        <option value="<?= htmlspecialchars($color) ?>"
-                            <?= (isset($_GET['color']) && $_GET['color'] == $color) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars(ucfirst($color)) ?>
-                        </option>
+                            <option value="<?= htmlspecialchars($color) ?>"
+                                <?= (isset($_GET['color']) && $_GET['color'] == $color) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars(ucfirst($color)) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -191,34 +191,32 @@ $sql = "SELECT * FROM Car";
 
         <!-- Car Listings -->
         <div class="row mt-4">
-            <?php foreach ($cars as $car): ?>
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
-                    <img src="<?php echo htmlspecialchars($car['car_image']); ?>" class="card-img-top" alt="Car Image">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($car['model_name']); ?></h5>
-                        <p class="card-text">Plate No: <?php echo htmlspecialchars($car['plate_No']) ?></p>
-                        <p class="card-text">Year: <?php echo htmlspecialchars($car['model_year'])?></p>
-                        <p class="card-text">Type: <?php echo htmlspecialchars($car['type'])?></p>
-                        <p class="card-text">Transmission: <?php echo htmlspecialchars($car['transmission'])?></p>
-                        <p class="card-text">Price/Day: BD<?php echo htmlspecialchars($car['price_day'])?></p>
-                        <p class="card-text">Color: <?php echo htmlspecialchars($car['color'])?></p>
-
-                        <span
-                            class="badge <?= ($car['status'] === 'rented') ? 'text-bg-danger' : 'text-bg-success'; ?> rounded-pill">
-                            <?= htmlspecialchars($car['status']); ?>
-                        </span>
-
-                        <br>
-                        <br>
-
-                        <a href="view_details.php?id=<?php echo $car['plate_No']; ?>" class="btn btn-outline-dark">
-                            View Details
-                        </a>
-                    </div>
+            <!-- Display cars -->
+            <?php if ($cars): ?>
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <?php foreach ($cars as $car): ?>
+                        <div class="col">
+                            <div class="card user-card">
+                                <img src="<?= htmlspecialchars($car['car_image']) ?>" class="card-img-top" alt="Car Image">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title"><?= htmlspecialchars($car['model_name']) ?> (<?= htmlspecialchars($car['model_year']) ?>)</h5>
+                                    <p class="card-text">Plate No: <?= htmlspecialchars($car['plate_No']) ?></p>
+                                    <p class="card-text">Type: <?= htmlspecialchars($car['type']) ?></p>
+                                    <p class="card-text">Transmission: <?= htmlspecialchars($car['transmission']) ?></p>
+                                    <p class="card-text">Price Per Day: BD<?= number_format($car['price_day'], 2) ?></p>
+                                    <p class="card-text">Color: <?php echo htmlspecialchars($car['color']) ?></p>
+                                    <p class="card-text">Status: <strong><?= ucfirst(htmlspecialchars($car['status'])) ?></strong></p>
+                                    <a href="view_details.php?id=<?php echo $car['plate_No']; ?>" class="btn btn-sm btn-outline-dark btn-cancel">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-            </div>
-            <?php endforeach; ?>
+            <?php else: ?>
+                <p class="text-center">No Cars found.</p>
+            <?php endif; ?>
         </div>
     </div>
 </body>

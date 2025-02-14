@@ -18,6 +18,7 @@ try {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,9 +38,12 @@ try {
         }
     </style>
 </head>
+
 <body>
-    <div class="container mt-4">    
-        <h1 class="text-center mb-4">Bookings Management</h1>      
+    <div class="container mt-4">
+        <header class="text-center mb-4">
+            <h1 class="display-4">Bookings Management</h1>
+        </header>
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <?php foreach ($bookings as $booking): ?>
                 <div class="col">
@@ -51,9 +55,9 @@ try {
                             <p class="card-text">Dates: from <?php echo htmlspecialchars($booking['start_date']); ?> until <?php echo htmlspecialchars($booking['end_date']); ?></p>
                             <p class="card-text">Fees: <?php echo htmlspecialchars($booking['total_price']); ?></p>
                             <p class="card-text">Status: <?php echo htmlspecialchars($booking['status']); ?></p>
-                            <a href="delete_booking.php?id=<?php echo $booking['booking_id']; ?>" 
-                               class="btn btn-sm btn-outline-danger" 
-                               onclick="return confirm('Are you sure you want to cancel?');">
+                            <a href="delete_booking.php?id=<?php echo $booking['booking_id']; ?>"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Are you sure you want to cancel?');">
                                 Cancel Booking
                             </a>
                         </div>
@@ -63,4 +67,5 @@ try {
         </div>
     </div>
 </body>
+
 </html>

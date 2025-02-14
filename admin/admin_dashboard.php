@@ -12,7 +12,12 @@ include('../cleanup_bookings.php');
     <title>Admin Dashboard</title>
 </head>
 <body>
-    <h1>Welcome Admin</h1>
-    <a href="../logout_process.php">Log Out</a>
+<div class="container mt-5">
+        <header class="text-center mb-4">
+            <h1 class="display-4">Welcome <?php echo htmlspecialchars($_SESSION['user_name']);?> 
+            <a href="../logout_process.php" class="lead">Log Out</a></h1>
+            <p class="lead">Manage all orations through the dashboard!</p>
+        </header>
+</div>
 </body>
 </html>
