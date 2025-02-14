@@ -1,7 +1,7 @@
 <?php
-    session_start();
-    include('../db_con.php');
-    include('../nav.php');
+session_start();
+include('../db_con.php');
+include('../nav.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">

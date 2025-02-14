@@ -5,11 +5,7 @@ include('nav_bar.php');
 
 try {
     // Fetch all confirmed bookings with user and car details in a single query
-    $sql = "SELECT b.*, u.username, c.model_name 
-            FROM Booking b
-            JOIN User u ON b.user_id = u.ID
-            JOIN Car c ON b.plate_No = c.plate_No
-            WHERE b.status = 'confirmed'";
+    $sql = "SELECT * FROM Booking WHERE status = 'confirmed'";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -49,9 +45,9 @@ try {
                     <div class="card user-card">
                         <div class="card-body text-center">
                             <h5 class="card-title">Booking ID: <?php echo htmlspecialchars($booking['booking_id']); ?></h5>
-                            <p class="card-text">Car: <?php echo htmlspecialchars($booking['model_name']); ?> - <?php echo htmlspecialchars($booking['plate_No']); ?></p>
-                            <p class="card-text">Customer: <?php echo htmlspecialchars($booking['username']); ?> - <?php echo htmlspecialchars($booking['user_email']); ?></p>
-                            <p class="card-text">Dates: <?php echo htmlspecialchars($booking['start_date']); ?> - <?php echo htmlspecialchars($booking['end_date']); ?></p>
+                            <p class="card-text">Car: <?php echo htmlspecialchars($booking['plate_No']); ?></p>
+                            <p class="card-text">Customer: <?php echo htmlspecialchars($booking['user_email']); ?></p>
+                            <p class="card-text">Dates: from <?php echo htmlspecialchars($booking['start_date']); ?> until <?php echo htmlspecialchars($booking['end_date']); ?></p>
                             <p class="card-text">Fees: <?php echo htmlspecialchars($booking['total_price']); ?></p>
                             <p class="card-text">Status: <?php echo htmlspecialchars($booking['status']); ?></p>
                             <a href="delete_booking.php?id=<?php echo $booking['booking_id']; ?>" 
