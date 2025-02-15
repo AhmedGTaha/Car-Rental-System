@@ -4,7 +4,7 @@ include('../db_con.php');
 include('nav_bar.php');
 
 // Clear previous errors and input on initial load
-if (empty($_POST) && isset($_SESSION['errors'])) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && isset($_SESSION['errors'])) {
     unset($_SESSION['errors'], $_SESSION['old_input']);
 }
 
@@ -18,52 +18,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $type = trim($_POST['type']);
     $transmission = trim($_POST['transmission']);
     $price_day = trim($_POST['price']);
-    $status = "available";
     $color = trim($_POST['color']);
+    $status = "available";
 
-    // Validate plate number
-    if (empty($plate_No)) {
-        $errors['plate-number'] = "Plate number is required";
-    } elseif (!preg_match('/^[0-9]+$/', $plate_No)) {
-        $errors['plate-number'] = "Invalid plate number (numbers only)";
+    // Validation rules
+    $validations = [
+        'plate-number' => ['value' => $plate_No, 'pattern' => '/^[0-9]+$/', 'message' => 'Invalid plate number (numbers only)'],
+        'model-name' => ['value' => $model_name, 'pattern' => '/^[a-zA-Z0-9 -]+$/', 'message' => 'Invalid model name (alphanumeric and hyphens only)'],
+        'model-year' => ['value' => $year, 'pattern' => '/^(19|20)\d{2}$/', 'message' => 'Invalid model year (1900-2099)'],
+        'color' => ['value' => $color, 'pattern' => '/^[a-zA-Z ]+$/', 'message' => 'Invalid color (letters and spaces only)'],
+    ];
+
+    foreach ($validations as $field => $rule) {
+        if (empty($rule['value'])) {
+            $errors[$field] = ucfirst(str_replace('-', ' ', $field)) . " is required";
+        } elseif (!preg_match($rule['pattern'], $rule['value'])) {
+            $errors[$field] = $rule['message'];
+        }
     }
 
-    // Validate model name
-    if (empty($model_name)) {
-        $errors['model-name'] = "Model name is required";
-    } elseif (!preg_match('/^[a-zA-Z0-9 -]+$/', $model_name)) {
-        $errors['model-name'] = "Invalid model name (alphanumeric characters and hyphens only)";
-    }
-
-    // Validate year
-    if (empty($year)) {
-        $errors['model-year'] = "Model year is required";
-    } elseif (!preg_match('/^(19|20)\d{2}$/', $year)) {
-        $errors['model-year'] = "Invalid model year (1900-2099)";
-    }
-
-    // Validate price
     if (empty($price_day)) {
         $errors['price'] = "Price is required";
-    } elseif ($price_day <= 0) {
+    } elseif (!is_numeric($price_day) || $price_day <= 0) {
         $errors['price'] = "Price must be greater than 0";
     }
 
-    // Validate color
-    if (empty($color)) {
-        $errors['color'] = "Color is required";
-    } elseif (!preg_match('/^[a-zA-Z ]+$/', $color)) {
-        $errors['color'] = "Invalid color (letters and spaces only)";
-    }
-
-    // Validate image
     if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
         $errors['image'] = "Car image is required";
     } else {
-        if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
-            $errors['image'] = "File size exceeds 5MB limit";
-        }
-
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
         $file_mime = mime_content_type($_FILES['image']['tmp_name']);
         if (!in_array($file_mime, $allowed_types)) {
@@ -77,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM Car WHERE plate_No = :plate_No");
             $stmt_check->bindParam(':plate_No', $plate_No);
             $stmt_check->execute();
-            
             if ($stmt_check->fetchColumn() > 0) {
                 $errors['plate-number'] = "A car with this plate number already exists";
             }
@@ -88,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (empty($errors)) {
         try {
-            // Process image upload
             $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
             $unique_name = uniqid() . '.' . strtolower($file_extension);
             $target_directory = '../uploads/';
@@ -100,11 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             chmod($target_file, 0644);
 
-            // Insert into database
-            $sql = "INSERT INTO Car (plate_No, model_name, model_year, type, transmission, price_day, status, color, car_image) 
-                    VALUES (:plate_No, :model_name, :model_year, :type, :transmission, :price_day, :status, :color, :car_image)";
-            
-            $stmt = $pdo->prepare($sql);
+            $stmt = $pdo->prepare("INSERT INTO Car (plate_No, model_name, model_year, type, transmission, price_day, status, color, car_image) 
+                    VALUES (:plate_No, :model_name, :model_year, :type, :transmission, :price_day, :status, :color, :car_image)");
             $stmt->execute([
                 'plate_No' => $plate_No,
                 'model_name' => $model_name,
@@ -124,12 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    if (!empty($errors)) {
-        $_SESSION['errors'] = $errors;
-        $_SESSION['old_input'] = $_POST;
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    }
+    $_SESSION['errors'] = $errors;
+    $_SESSION['old_input'] = $_POST;
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
 }
 ?>
 

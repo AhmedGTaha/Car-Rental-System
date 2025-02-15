@@ -1,70 +1,118 @@
 <?php
 session_start();
-include('db_con.php'); // Database connection
+include('../db_con.php');
+include('../nav.php');
+include('../cleanup_bookings.php');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = trim($_POST['name']);
-    $email = trim($_POST['email']);
-    $phone = trim($_POST['phone']);
-    $password = trim($_POST['password']);
-    $confirmPassword = trim($_POST['confirmPassword']);
-    $role = trim($_POST['role']);
+if (isset($_SESSION['user_email'])) {
+    $user_email = $_SESSION['user_email'];
 
-    $errors = [];
-
-    if (!preg_match("/^[a-zA-Z-' ]+$/", $name)) {
-        $errors[] = "Invalid name format.";
-    }
-    
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !preg_match("/@gmail\.com$/", $email)) {
-        $errors[] = "Only Gmail addresses are allowed.";
-    }
-    
-    if (!preg_match("/^(3|6|9|1|7|8)[0-9]{7}$/", $phone)) {
-        $errors[] = "Invalid Bahrain phone number.";
-    }
-
-    if ($password !== $confirmPassword) {
-        $errors[] = "Passwords do not match.";
-    }
-    
-    if ($errors) {
-        $_SESSION['errors'] = $errors;
-        $_SESSION['old_input'] = $_POST;
+    try {
+        $sql = "SELECT * FROM user WHERE email = :email";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':email', $user_email);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        $_SESSION['errors'] = ["Error fetching user details."];
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
 
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $errors = [];
 
-    try {
-        $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM User WHERE email = :email");
-        $stmt_check->execute(['email' => $email]);
-        if ($stmt_check->fetchColumn() > 0) {
-            $_SESSION['errors'] = ["Email already exists. Use a different email address."];
+        $name = trim($_POST['name']);
+        $email = trim($_POST['email']);
+        $phone = trim($_POST['phone']);
+        $password = trim($_POST['password']);
+        $profile_image = $_FILES['profile-image']['name'] ? $_FILES['profile-image']['name'] : $user['profile_image'];
+
+        if (!preg_match("/^[a-zA-Z-' ]+$/", $name)) {
+            $errors[] = "Invalid name format.";
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !preg_match("/@gmail\.com$/", $email)) {
+            $errors[] = "Only Gmail addresses are allowed.";
+        }
+
+        if (!preg_match("/^(3|6|9|1|7|8)[0-9]{7}$/", $phone)) {
+            $errors[] = "Invalid Bahrain phone number.";
+        }
+
+        if ($errors) {
+            $_SESSION['errors'] = $errors;
             $_SESSION['old_input'] = $_POST;
             header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         }
 
-        $stmt = $pdo->prepare("INSERT INTO User (username, email, phone_No, password, role, profile_image) VALUES (:name, :email, :phone, :password, :role, :image)");
-        $stmt->execute([
-            'name' => $name,
-            'email' => $email,
-            'phone' => $phone,
-            'password' => $hashedPassword,
-            'role' => $role,
-            'image' => "..\pic\user.png"
-        ]);
+        try {
+            // Check for existing email (excluding the current user)
+            $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM user WHERE email = :email AND email != :current_email");
+            $stmt_check->execute(['email' => $email, 'current_email' => $user_email]);
 
-        $_SESSION['registration_success'] = "Account created successfully!";
-        header("Location: login.php");
-        exit();
-    } catch (PDOException $e) {
-        $_SESSION['errors'] = ["Error: Unable to register. Please try again later."];
-        $_SESSION['old_input'] = $_POST;
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
+            if ($stmt_check->fetchColumn() > 0) {
+                $_SESSION['errors'] = ["Email already exists. Use a different email address."];
+                $_SESSION['old_input'] = $_POST;
+                header("Location: " . $_SERVER['PHP_SELF']);
+                exit();
+            }
+
+            // Handle active bookings
+            $stmt_check_bookings = $pdo->prepare("SELECT COUNT(*) FROM booking WHERE user_email = :user_email");
+            $stmt_check_bookings->bindParam(':user_email', $user_email);
+            $stmt_check_bookings->execute();
+            $active_rentals = $stmt_check_bookings->fetchColumn();
+
+            if ($active_rentals > 0) {
+                $update_active_SQL = "UPDATE booking SET user_email = :new_email WHERE user_email = :user_email";
+                $stmt_update_active = $pdo->prepare($update_active_SQL);
+                $stmt_update_active->bindParam(':new_email', $email);
+                $stmt_update_active->bindParam(':user_email', $user_email);
+                $stmt_update_active->execute();
+            }
+
+            // Handle profile image upload
+            if (!empty($_FILES['profile-image']['name'])) {
+                $target_dir = "../uploads/";
+                $target_file = $target_dir . basename($_FILES['profile-image']['name']);
+                move_uploaded_file($_FILES['profile-image']['tmp_name'], $target_file);
+            }
+
+            // Update user details
+            if (!empty($password)) {
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $update_SQL = "UPDATE user 
+                               SET username = :name, email = :email, phone_No = :phone, password = :password, profile_image = :profile_image 
+                               WHERE email = :user_email";
+                $stmt_update = $pdo->prepare($update_SQL);
+                $stmt_update->bindParam(':password', $hashedPassword);
+            } else {
+                $update_SQL = "UPDATE user 
+                               SET username = :name, email = :email, phone_No = :phone, profile_image = :profile_image 
+                               WHERE email = :user_email";
+                $stmt_update = $pdo->prepare($update_SQL);
+            }
+
+            $stmt_update->bindParam(':name', $name);
+            $stmt_update->bindParam(':email', $email);
+            $stmt_update->bindParam(':phone', $phone);
+            $stmt_update->bindParam(':profile_image', $profile_image);
+            $stmt_update->bindParam(':user_email', $user_email);
+            $stmt_update->execute();
+
+            $_SESSION['success'] = "Profile updated successfully.";
+            $_SESSION['user_email'] = $email;
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
+
+        } catch (PDOException $e) {
+            $_SESSION['errors'] = ["Error updating profile. Please try again later."];
+            $_SESSION['old_input'] = $_POST;
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
+        }
     }
 }
 ?>
