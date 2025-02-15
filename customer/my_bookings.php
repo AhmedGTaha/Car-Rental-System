@@ -87,7 +87,7 @@ try {
                                     <p class="card-text">Total: BD<?= number_format($booking['total_price'], 2) ?></p>
                                     <p class="card-text">Status: <strong><?= ucfirst(htmlspecialchars($booking['status'])) ?></strong></p>
 
-                                    <?php if ($booking['status'] === 'confirmed' && $booking['start_date'] >= date('Y-m-d')): ?>
+                                    <?php if ($booking['status'] === 'confirmed'): ?>
                                         <form action="cancel_booking.php" method="POST">
                                             <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
                                             <button type="submit" class="btn btn-sm btn-outline-danger btn-cancel"

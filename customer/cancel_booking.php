@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['booking_id'])) {
         $stmt->execute();
         $booking = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$booking || $booking['start_date'] < date('Y-m-d')) {
+        if (!$booking) {
             throw new Exception("Booking cannot be canceled.");
         }
 
