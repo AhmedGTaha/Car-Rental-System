@@ -101,8 +101,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $pdo->commit();
             $_SESSION['success'] = "Profile updated successfully";
+
+            //update session variables
+            $_SESSION['user_name'] = $name;
+            $_SESSION['user_phone'] = $phone;
+            $_SESSION['user_profile_image'] = $profile_image;
             $_SESSION['user_email'] = $email;
-            header("Location: " . $_SERVER['PHP_SELF']);
+            header("Location: ". $_SERVER['PHP_SELF']);
             exit();
         } catch (PDOException $e) {
             $pdo->rollBack();
@@ -160,73 +165,82 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body class="d-flex flex-column min-vh-100">
     <main class="flex-grow-1 d-flex align-items-center justify-content-center">
-        <div class="profile-container p-4 shadow-sm">
-            <header class="text-center mb-4">
-                <h1 class="display-4">Edit Profile</h1>
-            </header>
-            <?php if (isset($_SESSION['errors']['database'])): ?>
-                <div class="alert alert-danger">
-                    <?= htmlspecialchars($_SESSION['errors']['database']) ?>
-                </div>
-            <?php endif; ?>
+        <div class="container">
+            <div class="row justify-content-center align-items-center min-vh-100">
+                <div class="col-11 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <header class="text-center mb-4">
+                                <h1 class="display-4">Edit Profile</h1>
+                            </header>
+                            <?php if (isset($_SESSION['errors']['database'])): ?>
+                                <div class="alert alert-danger">
+                                    <?= htmlspecialchars($_SESSION['errors']['database']) ?>
+                                </div>
+                            <?php endif; ?>
+                            <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post" enctype="multipart/form-data" id="edit-profile">
+                                <div class="text-center mb-3">
+                                    <img src="<?= htmlspecialchars($user['profile_image']) ?>" alt="Profile Image" class="profile-image" id="profilePreview">
+                                </div>
 
-            <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post" enctype="multipart/form-data" id="edit-profile">
-                <div class="text-center mb-3">
-                    <img src="<?= htmlspecialchars($user['profile_image']) ?>" alt="Profile Image" class="profile-image" id="profilePreview">
-                </div>
-                <?php if (isset($_SESSION['success'])): ?>
-                    <div class="alert alert-success" style="margin-top: 10px;">
-                        <?= htmlspecialchars($_SESSION['success']) ?>
+                                <?php if (isset($_SESSION['success'])): ?>
+                                    <div class="alert alert-success" style="margin-top: 10px;">
+                                        <?= htmlspecialchars($_SESSION['success']) ?>
+                                    </div>
+                                <?php unset($_SESSION['success']);
+                                endif; ?>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Profile Image</label>
+                                    <input type="file" class="form-control <?= isset($_SESSION['errors']['profile-image']) ? 'error-border' : '' ?>"
+                                        name="profile-image" accept="image/*">
+                                    <?php if (isset($_SESSION['errors']['profile-image'])): ?>
+                                        <div class="error-message"><?= $_SESSION['errors']['profile-image'] ?></div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control <?= isset($_SESSION['errors']['name']) ? 'error-border' : '' ?>"
+                                        name="name" value="<?= htmlspecialchars($_SESSION['old_input']['name'] ?? $user['username']) ?>" required>
+                                    <?php if (isset($_SESSION['errors']['name'])): ?>
+                                        <div class="error-message"><?= $_SESSION['errors']['name'] ?></div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control <?= isset($_SESSION['errors']['email']) ? 'error-border' : '' ?>"
+                                        id="email" name="email" value="<?= htmlspecialchars($_SESSION['old_input']['email'] ?? $user['email']) ?>" required>
+                                    <?php if (isset($_SESSION['errors']['email'])): ?>
+                                        <div class="error-message"><?= $_SESSION['errors']['email'] ?></div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="text" class="form-control <?= isset($_SESSION['errors']['phone']) ? 'error-border' : '' ?>"
+                                        name="phone" value="<?= htmlspecialchars($_SESSION['old_input']['phone'] ?? $user['phone_No']) ?>" required>
+                                    <?php if (isset($_SESSION['errors']['phone'])): ?>
+                                        <div class="error-message"><?= $_SESSION['errors']['phone'] ?></div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">New Password (Optional)</label>
+                                    <input type="password" class="form-control <?= isset($_SESSION['errors']['password']) ? 'error-border' : '' ?>"
+                                        name="password">
+                                    <?php if (isset($_SESSION['errors']['password'])): ?>
+                                        <div class="error-message"><?= $_SESSION['errors']['password'] ?></div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <button type="submit" class="btn btn-outline-dark w-100" onclick="return confirm('Are you sure you want to update your information?');">Save Changes</button>
+                            </form>
+                        </div>
                     </div>
-                <?php unset($_SESSION['success']); endif; ?>
-
-                <div class="mb-3">
-                    <label class="form-label">Profile Image</label>
-                    <input type="file" class="form-control <?= isset($_SESSION['errors']['profile-image']) ? 'error-border' : '' ?>"
-                        name="profile-image" accept="image/*">
-                    <?php if (isset($_SESSION['errors']['profile-image'])): ?>
-                        <div class="error-message"><?= $_SESSION['errors']['profile-image'] ?></div>
-                    <?php endif; ?>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Username</label>
-                    <input type="text" class="form-control <?= isset($_SESSION['errors']['name']) ? 'error-border' : '' ?>"
-                        name="name" value="<?= htmlspecialchars($_SESSION['old_input']['name'] ?? $user['username']) ?>" required>
-                    <?php if (isset($_SESSION['errors']['name'])): ?>
-                        <div class="error-message"><?= $_SESSION['errors']['name'] ?></div>
-                    <?php endif; ?>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control <?= isset($_SESSION['errors']['email']) ? 'error-border' : '' ?>"
-                        id="email" name="email" value="<?= htmlspecialchars($_SESSION['old_input']['email'] ?? $user['email']) ?>" required>
-                    <?php if (isset($_SESSION['errors']['email'])): ?>
-                        <div class="error-message"><?= $_SESSION['errors']['email'] ?></div>
-                    <?php endif; ?>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Phone Number</label>
-                    <input type="text" class="form-control <?= isset($_SESSION['errors']['phone']) ? 'error-border' : '' ?>"
-                        name="phone" value="<?= htmlspecialchars($_SESSION['old_input']['phone'] ?? $user['phone_No']) ?>" required>
-                    <?php if (isset($_SESSION['errors']['phone'])): ?>
-                        <div class="error-message"><?= $_SESSION['errors']['phone'] ?></div>
-                    <?php endif; ?>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">New Password (Optional)</label>
-                    <input type="password" class="form-control <?= isset($_SESSION['errors']['password']) ? 'error-border' : '' ?>"
-                        name="password">
-                    <?php if (isset($_SESSION['errors']['password'])): ?>
-                        <div class="error-message"><?= $_SESSION['errors']['password'] ?></div>
-                    <?php endif; ?>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Are you sure you want to update your information?');">Save Changes</button>
-            </form>
+            </div>
         </div>
     </main>
 

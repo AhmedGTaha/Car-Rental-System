@@ -3,6 +3,22 @@ session_start();
 include('../db_con.php');
 include('nav_bar.php');
 include('../cleanup_bookings.php');
+
+// Ensure user is logged in
+if (!isset($_SESSION['user_name'])) {
+    header('Location: ../login.php');
+    exit();
+}
+
+// Get current hour for greeting
+$hour = date('H');
+if ($hour >= 5 && $hour < 12) {
+    $greeting = 'Good Morning';
+} elseif ($hour >= 12 && $hour < 17) {
+    $greeting = 'Good Afternoon';
+} else {
+    $greeting = 'Good Evening';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,7 +42,7 @@ include('../cleanup_bookings.php');
     <main class="flex-grow-1">
         <div class="container mt-5">
             <header class="text-center mb-4">
-                <h1 class="display-4">Welcome <?php echo htmlspecialchars($_SESSION['user_name']);?>
+                <h1 class="display-4"><?php echo htmlspecialchars($greeting)?>, <?php echo htmlspecialchars($_SESSION['user_name']);?>
                     <a href="../logout_process.php" class="lead">Log Out</a></h1>
                 <p class="lead">Manage all orations through the dashboard!</p>
             </header>
