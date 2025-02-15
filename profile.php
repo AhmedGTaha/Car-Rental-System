@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             //update session variables
             $_SESSION['user_name'] = $name;
             $_SESSION['user_phone'] = $phone;
-            $_SESSION['user_profile_image'] = $profile_image;
+            $_SESSION['user_pic'] = $profile_image;
             $_SESSION['user_email'] = $email;
             header("Location: ". $_SERVER['PHP_SELF']);
             exit();
