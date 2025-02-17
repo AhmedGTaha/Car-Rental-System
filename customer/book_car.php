@@ -8,6 +8,13 @@ if (!isset($_SESSION['user_email'])) {
     exit();
 }
 
+// Function to redirect with an error message
+function redirectWithError($message)
+{
+    echo "<script>alert('$message'); window.location.href='view_details.php';</script>";
+    exit();
+}
+
 // Validate form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userEmail = $_SESSION['user_email'];
@@ -18,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate date selection
     if (strtotime($endDate) <= strtotime($startDate)) {
-        die("Error: Return date must be after the pick-up date.");
+        redirectWithError("Return date must be after the pick-up date.");
     }
 
     // Check if car is available for rent
@@ -39,11 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (strtotime($startDate) > strtotime($booking['end_date'])) {
                 // Proceed with the booking
             } else {
-                die("Error: Car is already booked for the selected period.");
+                redirectWithError("Car is already booked for the selected period.");
             }
         }
     } catch (PDOException $e) {
-        die("Database error: " . $e->getMessage());
+        redirectWithError("Database error: " . $e->getMessage());
     }
 
     // Fetch car price per day and availability
@@ -55,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $car = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$car) {
-            die("Error: Car not found.");
+            redirectWithError("Car not found.");
         }
 
         // Ignore the car's rented status if booking is not overlapping
@@ -101,12 +108,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: home.php?success=1");
             exit();
         } else {
-            echo "<script>alert('Car is not available for rent.')</script>";
-            header("Location: home.php");
-            exit();
+            redirectWithError("Car is not available for rent.");
         }
     } catch (PDOException $e) {
-        die("Database error: " . $e->getMessage());
+        redirectWithError("Database error: " . $e->getMessage());
     }
 }
-?>
