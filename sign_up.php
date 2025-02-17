@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <button type="submit" class="btn btn-outline-dark">Create Account</button>
                             </div>
                         </form>
-                        <p class="text-body-secondary" style="text-align: center;">Already have an account? <a href="login.php" class="text-decoration-none" style="color:#006aff;">Login</a></p>
+                        <p class="text-body-secondary" style="text-align: center; margin-top: 10px;">Already have an account? <a href="login.php" class="text-decoration-none" style="color:#006aff;">Login</a></p>
                     </div>
                 </div>
             </div>
