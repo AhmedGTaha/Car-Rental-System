@@ -24,10 +24,10 @@ if ($hour >= 5 && $hour < 12) {
     $greeting = 'Good Evening';
 }
 
-$users_SQL = "SELECT count(*) FROM user WHERE role = 'customer'";
+$users_SQL = "SELECT count(email) FROM user WHERE role = 'customer'";
 $users_stmt = $pdo->prepare($users_SQL);
 $users_stmt->execute();
-$total_users = $stmt->fetchColumn();
+$total_users = $users_stmt->fetchColumn();
 
 $rentals_SQL = "SELECT count(user_id) FROM booking";
 $rentals_stmt = $pdo->prepare($rentals_SQL);
@@ -55,13 +55,15 @@ $total_cars = $cars_stmt->fetchColumn();
             padding-bottom: 20px;
         }
 
-        .card {
+        .user-card {
             border: 1px solid #ddd;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s;
+            border-radius: 10px;
+            padding: 15px;
         }
 
-        .card:hover {
+        .user-card:hover {
             border: 1px solid #006aff;
             transform: scale(1.05);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
@@ -131,30 +133,33 @@ $total_cars = $cars_stmt->fetchColumn();
                 </div>
             </div>
         </div>
-        <!-- Numbers -->
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            <div class="col">
-                <div class="card user-card">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Total Customers: <?php echo htmlspecialchars($total_users); ?></h5>
+        <!-- Numbers Section -->
+        <div class="container my-5">
+            <div class="row justify-content-center" style="padding:10px;">
+                <div class="col-md-4">
+                    <div class="card user-card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Customers: <?php echo htmlspecialchars($total_users); ?></h5>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="card user-card">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Total Cars: <?php echo htmlspecialchars($total_cars); ?></h5>
+                <div class="col-md-4">
+                    <div class="card user-card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Cars: <?php echo htmlspecialchars($total_cars); ?></h5>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="card user-card">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Active Rentals: <?php echo htmlspecialchars($total_rentals); ?></h5>
+                <div class="col-md-4">
+                    <div class="card user-card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Active Rentals: <?php echo htmlspecialchars($total_rentals); ?></h5>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <section id="contact" class="mt-5">
             <h3 class="text-center display-4">Need Any Assistance?</h3>
             <p class="text-center">Contact me for any queries or suggestions on <a href="https://github.com/AhmedGTaha">GitHub</a></p>
