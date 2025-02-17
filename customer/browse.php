@@ -209,7 +209,6 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="card-body text-center">
                                 <h5 class="card-title"><?= htmlspecialchars($car['model_name']) ?>
                                     (<?= htmlspecialchars($car['model_year']) ?>)</h5>
-                                <p class="card-text">Plate No: <?= htmlspecialchars($car['plate_No']) ?></p>
                                 <p class="card-text">Type: <?= htmlspecialchars($car['type']) ?></p>
                                 <p class="card-text">Transmission: <?= htmlspecialchars($car['transmission']) ?></p>
                                 <p class="card-text">Price Per Day: BD<?= number_format($car['price_day'], 2) ?></p>
@@ -218,7 +217,7 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <strong><?= ucfirst(htmlspecialchars($car['status'])) ?></strong></p>
                                 <a href="view_details.php?id=<?php echo $car['plate_No']; ?>"
                                     class="btn btn-sm btn-outline-dark btn-cancel">
-                                    View Details
+                                    Book Now !
                                 </a>
                             </div>
                         </div>

@@ -274,7 +274,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <?php endif; ?>
                         </div>
 
-                        <button type="submit" class="btn btn-outline-primary">Update Car</button>
+                        <button type="submit" class="btn btn-outline-success">Update Car</button>
                         <a href="cars.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
