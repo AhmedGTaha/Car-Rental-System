@@ -77,7 +77,7 @@ try {
           <div class="card user-card">
             <div class="card-body text-center">
               <img src="<?php echo htmlspecialchars($user['profile_image']) ?? '../pic/user.png'; ?>"
-                class="rounded-circle mb-3" alt="User Avatar">
+                class="rounded-circle mb-3" alt="User Avatar" loading="lazy">
               <h5 class="card-title"><?php echo htmlentities($user['username']); ?></h5>
               <p class="card-text">Email: <?php echo htmlspecialchars($user['email']); ?></p>
               <p class="card-text">Phone: <?php echo htmlspecialchars($user['phone_No']); ?></p>
