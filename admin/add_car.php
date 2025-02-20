@@ -3,6 +3,12 @@ session_start();
 include('../db_con.php');
 include('nav_bar.php');
 
+function redirectWithError($message)
+{
+    echo "<script>alert('$message'); window.location.href='add_car.php';</script>";
+    exit();
+}
+
 // Clear previous errors and input on initial load
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' && isset($_SESSION['errors'])) {
     unset($_SESSION['errors'], $_SESSION['old_input']);
@@ -49,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
         $file_mime = mime_content_type($_FILES['image']['tmp_name']);
         if (!in_array($file_mime, $allowed_types)) {
+            redirectWithError("Invalid file type (only JPG, PNG, GIF allowed)");
             $errors['image'] = "Invalid file type (only JPG, PNG, GIF allowed)";
         }
     }
@@ -60,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt_check->bindParam(':plate_No', $plate_No);
             $stmt_check->execute();
             if ($stmt_check->fetchColumn() > 0) {
+                redirectWithError("A car with this plate number already exists");
                 $errors['plate-number'] = "A car with this plate number already exists";
             }
         } catch (PDOException $e) {
@@ -75,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $target_file = $target_directory . $unique_name;
 
             if (!move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+                redirectWithError("Failed to save uploaded file");
                 throw new Exception('Failed to save uploaded file');
             }
 
@@ -95,6 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ]);
 
             header('Location: cars.php');
+            echo "<script>alert('Car added successfully'); window.location.href='cars.php';</script>";
+
             exit();
         } catch (Exception $e) {
             $errors['database'] = "Error: " . $e->getMessage();
@@ -149,21 +160,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <h3 class="mb-3">Add a Car</h3>
 
                     <?php if (isset($_SESSION['errors']['database'])): ?>
-                    <div class="alert alert-danger">
-                        <?php echo htmlspecialchars($_SESSION['errors']['database']); ?>
-                    </div>
+                        <div class="alert alert-danger">
+                            <?php echo htmlspecialchars($_SESSION['errors']['database']); ?>
+                        </div>
                     <?php endif; ?>
 
                     <?php if (isset($errors['image'])): ?>
-                    <div class="alert alert-danger">
-                        <?php echo htmlspecialchars($errors['image']); ?>
-                    </div>
+                        <div class="alert alert-danger">
+                            <?php echo htmlspecialchars($errors['image']); ?>
+                        </div>
                     <?php endif; ?>
 
-                    <?php if (isset($errors['plate-number'])):?>
-                    <div class="alert alert-danger">
-                        <?php echo htmlspecialchars($errors['plate-number']); ?>
-                    </div>
+                    <?php if (isset($errors['plate-number'])): ?>
+                        <div class="alert alert-danger">
+                            <?php echo htmlspecialchars($errors['plate-number']); ?>
+                        </div>
                     <?php endif; ?>
 
                     <form method="post" enctype="multipart/form-data"
@@ -173,9 +184,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <input type="number"
                                 class="form-control <?= isset($_SESSION['errors']['plate-number']) ? 'error-border' : '' ?>"
                                 id="plate-number" name="plate-number"
-                                value="<?= htmlspecialchars($_SESSION['old_input']['plate-number'] ?? '') ?>" required>
+                                value="<?= htmlspecialchars($_SESSION['old_input']['plate-number'] ?? '') ?>" placeholder="106210" required>
                             <?php if (isset($_SESSION['errors']['plate-number'])): ?>
-                            <div class="error-message"><?= $_SESSION['errors']['plate-number'] ?></div>
+                                <div class="error-message"><?= $_SESSION['errors']['plate-number'] ?></div>
                             <?php endif; ?>
                         </div>
 
@@ -184,9 +195,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <input type="text"
                                 class="form-control <?= isset($_SESSION['errors']['model-name']) ? 'error-border' : '' ?>"
                                 id="model-name" name="model-name"
-                                value="<?= htmlspecialchars($_SESSION['old_input']['model-name'] ?? '') ?>" required>
+                                value="<?= htmlspecialchars($_SESSION['old_input']['model-name'] ?? '') ?>" placeholder="Toyota" required>
                             <?php if (isset($_SESSION['errors']['model-name'])): ?>
-                            <div class="error-message"><?= $_SESSION['errors']['model-name'] ?></div>
+                                <div class="error-message"><?= $_SESSION['errors']['model-name'] ?></div>
                             <?php endif; ?>
                         </div>
 
@@ -195,9 +206,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <input type="number"
                                 class="form-control <?= isset($_SESSION['errors']['model-year']) ? 'error-border' : '' ?>"
                                 id="model-year" name="model-year"
-                                value="<?= htmlspecialchars($_SESSION['old_input']['model-year'] ?? '') ?>" required>
+                                value="<?= htmlspecialchars($_SESSION['old_input']['model-year'] ?? '') ?>" placeholder="2011" required>
                             <?php if (isset($_SESSION['errors']['model-year'])): ?>
-                            <div class="error-message"><?= $_SESSION['errors']['model-year'] ?></div>
+                                <div class="error-message"><?= $_SESSION['errors']['model-year'] ?></div>
                             <?php endif; ?>
                         </div>
 
@@ -227,9 +238,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <input type="number" step="0.01"
                                 class="form-control <?= isset($_SESSION['errors']['price']) ? 'error-border' : '' ?>"
                                 id="price" name="price"
-                                value="<?= htmlspecialchars($_SESSION['old_input']['price'] ?? '') ?>" required>
+                                value="<?= htmlspecialchars($_SESSION['old_input']['price'] ?? '') ?>" placeholder="10.00" required>
                             <?php if (isset($_SESSION['errors']['price'])): ?>
-                            <div class="error-message"><?= $_SESSION['errors']['price'] ?></div>
+                                <div class="error-message"><?= $_SESSION['errors']['price'] ?></div>
                             <?php endif; ?>
                         </div>
 
@@ -238,9 +249,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <input type="text"
                                 class="form-control <?= isset($_SESSION['errors']['color']) ? 'error-border' : '' ?>"
                                 id="color" name="color"
-                                value="<?= htmlspecialchars($_SESSION['old_input']['color'] ?? '') ?>" required>
+                                value="<?= htmlspecialchars($_SESSION['old_input']['color'] ?? '') ?>" placeholder="Grey" required>
                             <?php if (isset($_SESSION['errors']['color'])): ?>
-                            <div class="error-message"><?= $_SESSION['errors']['color'] ?></div>
+                                <div class="error-message"><?= $_SESSION['errors']['color'] ?></div>
                             <?php endif; ?>
                         </div>
 
@@ -248,9 +259,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <label for="image" class="form-label">Car Image</label>
                             <input type="file"
                                 class="form-control <?= isset($_SESSION['errors']['image']) ? 'error-border' : '' ?>"
-                                id="image" name="image" required>
+                                id="image" name="image" placeholder="PNG, JPEG" required>
                             <?php if (isset($_SESSION['errors']['image'])): ?>
-                            <div class="error-message"><?= $_SESSION['errors']['image'] ?></div>
+                                <div class="error-message"><?= $_SESSION['errors']['image'] ?></div>
                             <?php endif; ?>
                         </div>
 

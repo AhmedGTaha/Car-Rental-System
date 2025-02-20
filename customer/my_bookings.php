@@ -41,9 +41,11 @@ try {
         header {
             margin-bottom: 15px;
         }
+
         main {
             padding-bottom: 15px;
         }
+
         .card {
             border: 1px solid #ddd;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -65,7 +67,7 @@ try {
 <body class="d-flex flex-column min-vh-100">
     <main class="flex-grow-1">
         <div class="container mt-4">
-        <header>
+            <header>
                 <div class="row justify-content-center">
                     <div class="col-md-8 text-center">
                         <h2 class="display-4">My Bookings</h2>
@@ -88,13 +90,23 @@ try {
                                     <p class="card-text">Status: <strong><?= ucfirst(htmlspecialchars($booking['status'])) ?></strong></p>
 
                                     <?php if ($booking['status'] === 'confirmed'): ?>
-                                        <form action="cancel_booking.php" method="POST">
-                                            <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger btn-cancel"
-                                                onclick="return confirm('Are you sure you want to cancel?');">
-                                                Cancel Booking
-                                            </button>
-                                        </form>
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <form action="cancel_booking.php" method="POST">
+                                                <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Are you sure you want to cancel?');">
+                                                    Cancel
+                                                </button>
+                                            </form>
+
+                                            <form action="edit_booking.php" method="POST">
+                                                <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary"
+                                                    onclick="return confirm('Are you sure you want to reschedule?');">
+                                                    Reschedule
+                                                </button>
+                                            </form>
+                                        </div>
                                     <?php else: ?>
                                         <span class="text-muted">Not Cancellable</span>
                                     <?php endif; ?>
@@ -106,6 +118,7 @@ try {
             <?php else: ?>
                 <p class="text-center">No bookings found.</p>
             <?php endif; ?>
+
         </div>
     </main>
 </body>
