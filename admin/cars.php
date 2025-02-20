@@ -206,7 +206,7 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="card user-card">
                             <img src="<?= htmlspecialchars($car['car_image']) ?>" class="card-img-top" alt="Car Image">
                             <div class="card-body text-center">
-                                <h5 class="card-title"><?= htmlspecialchars($car['model_name']) ?>
+                                <h5 class="card-title" style="margin-bottom: 15px"><?= htmlspecialchars($car['model_name']) ?>
                                     (<?= htmlspecialchars($car['model_year']) ?>)</h5>
                                 <p class="card-text">Plate No: <?= htmlspecialchars($car['plate_No']) ?></p>
                                 <p class="card-text">Type: <?= htmlspecialchars($car['type']) ?></p>

@@ -38,7 +38,7 @@ try {
         if (!empty($car_image) && file_exists($car_image) && $car_image !== '../pic/car.jpg') {
             unlink($car_image);
         }
-        header("Location: cars.php");
+        echo "<script>alert('Car deleted successfully'); window.location.href='cars.php';</script>";
         exit();
     } else {
         throw new Exception("Failed to delete car.");
