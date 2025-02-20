@@ -126,8 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'car_image' => $car_image,
                 'plateNo' => $plateNo
             ]);
-
-            header("Location: cars.php");
+            
+            echo "<script>alert('Car added successfully'); window.location.href='cars.php';</script>";
             exit();
         } catch (Exception $e) {
             $errors['database'] = "Error updating car: " . $e->getMessage();

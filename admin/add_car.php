@@ -103,10 +103,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'car_image' => $target_file
             ]);
 
-            header('Location: cars.php');
             echo "<script>alert('Car added successfully'); window.location.href='cars.php';</script>";
-
             exit();
+            
         } catch (Exception $e) {
             $errors['database'] = "Error: " . $e->getMessage();
         }
