@@ -5,12 +5,12 @@ include('nav_bar.php');
 include('../cleanup_bookings.php');
 
 // Fetch all types and transmissions and statuses and model years and prices and colors from the database
-$types_sql = "SELECT DISTINCT type FROM Car";
-$transmissions_sql = "SELECT DISTINCT transmission FROM Car";
-$statuses_sql = "SELECT DISTINCT status FROM Car";
-$year_sql = "SELECT DISTINCT model_year FROM Car";
-$price_sql = "SELECT DISTINCT price_day FROM Car";
-$color_sql = "SELECT DISTINCT color FROM Car";
+$types_sql = "SELECT DISTINCT type FROM car";
+$transmissions_sql = "SELECT DISTINCT transmission FROM car";
+$statuses_sql = "SELECT DISTINCT status FROM car";
+$year_sql = "SELECT DISTINCT model_year FROM car";
+$price_sql = "SELECT DISTINCT price_day FROM car";
+$color_sql = "SELECT DISTINCT color FROM car";
 
 $types_stmt = $pdo->prepare($types_sql);
 $transmissions_stmt = $pdo->prepare($transmissions_sql);
@@ -62,7 +62,7 @@ if (!empty($_GET['color'])) {
     $params['color'] = $_GET['color'];
 }
 
-$sql = "SELECT * FROM Car";
+$sql = "SELECT * FROM car";
 if ($conditions) {
     $sql .= " WHERE " . implode(" AND ", $conditions);
 }

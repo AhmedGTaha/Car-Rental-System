@@ -10,7 +10,7 @@ $plateNo = $_GET['id'];
 
 try {
     // Fetch car details before deletion
-    $sql = "SELECT car_image, status FROM Car WHERE plate_No = :plateNo";
+    $sql = "SELECT car_image, status FROM car WHERE plate_No = :plateNo";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':plateNo', $plateNo);
     $stmt->execute();
@@ -30,7 +30,7 @@ try {
     $car_image = $car['car_image']; // Get image path
 
     // Delete the car from the database
-    $sql = "DELETE FROM Car WHERE plate_No = :plateNo";
+    $sql = "DELETE FROM car WHERE plate_No = :plateNo";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':plateNo', $plateNo);
 

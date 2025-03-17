@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Check plate number uniqueness
     if (empty($errors)) {
         try {
-            $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM Car WHERE plate_No = :plate_No");
+            $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM car WHERE plate_No = :plate_No");
             $stmt_check->bindParam(':plate_No', $plate_No);
             $stmt_check->execute();
             if ($stmt_check->fetchColumn() > 0) {
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             chmod($target_file, 0644);
 
-            $stmt = $pdo->prepare("INSERT INTO Car (plate_No, model_name, model_year, type, transmission, price_day, status, color, car_image) 
+            $stmt = $pdo->prepare("INSERT INTO car (plate_No, model_name, model_year, type, transmission, price_day, status, color, car_image) 
                     VALUES (:plate_No, :model_name, :model_year, :type, :transmission, :price_day, :status, :color, :car_image)");
             $stmt->execute([
                 'plate_No' => $plate_No,

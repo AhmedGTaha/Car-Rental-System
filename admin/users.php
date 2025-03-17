@@ -6,7 +6,7 @@ include('../cleanup_bookings.php');
 
 try {
     // Fetch all users from the database
-    $sql = "SELECT * FROM User";
+    $sql = "SELECT * FROM user";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);

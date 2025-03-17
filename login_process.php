@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = trim($_POST['password']);
 
     try {
-        $stmt = $pdo->prepare("SELECT * FROM User WHERE email = :email");
+        $stmt = $pdo->prepare("SELECT * FROM user WHERE email = :email");
         if (!$stmt) {
             throw new Exception("Database query preparation failed.");
         }

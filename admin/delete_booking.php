@@ -10,7 +10,7 @@ $booking_id = $_GET['id'];
 
 try {
     // Fetch the booking details before deletion
-    $sql = "SELECT plate_No FROM Booking WHERE booking_id = :booking_id";
+    $sql = "SELECT plate_No FROM booking WHERE booking_id = :booking_id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':booking_id', $booking_id, PDO::PARAM_INT);
     $stmt->execute();
@@ -24,13 +24,13 @@ try {
     $plate_No = $booking['plate_No'];
 
     // Delete the booking
-    $sql = "DELETE FROM Booking WHERE booking_id = :booking_id";
+    $sql = "DELETE FROM booking WHERE booking_id = :booking_id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':booking_id', $booking_id, PDO::PARAM_INT);
     
     if ($stmt->execute()) {
         // Update the car status to 'available'
-        $sql = "UPDATE Car SET status = 'available' WHERE plate_No = :plate_No";
+        $sql = "UPDATE car SET status = 'available' WHERE plate_No = :plate_No";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':plate_No', $plate_No, PDO::PARAM_STR);
         $stmt->execute();

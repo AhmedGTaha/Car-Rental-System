@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['booking_id'])) {
 
     try {
         // Fetch booking details
-        $sql = "SELECT plate_No, start_date FROM Booking WHERE booking_id = :booking_id AND status = 'confirmed'";
+        $sql = "SELECT plate_No, start_date FROM booking WHERE booking_id = :booking_id AND status = 'confirmed'";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':booking_id', $booking_id);
         $stmt->execute();
@@ -20,14 +20,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['booking_id'])) {
         }
 
         // Delete the booking
-        $sql = "DELETE FROM Booking WHERE booking_id = :booking_id";
+        $sql = "DELETE FROM booking WHERE booking_id = :booking_id";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':booking_id', $booking_id);
         $stmt->execute();
 
         // Update car status if there are no other bookings
         $plate_No = $booking['plate_No'];
-        $sql = "SELECT COUNT(*) FROM Booking WHERE plate_No = :plate_No";
+        $sql = "SELECT COUNT(*) FROM booking WHERE plate_No = :plate_No";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':plate_No', $plate_No);
         $stmt->execute();

@@ -5,7 +5,7 @@ include('nav_bar.php');
 include('../cleanup_bookings.php');
 try {
     // Fetch all confirmed bookings with user and car details in a single query
-    $sql = "SELECT * FROM Booking WHERE status = 'confirmed'";
+    $sql = "SELECT * FROM booking WHERE status = 'confirmed'";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute();

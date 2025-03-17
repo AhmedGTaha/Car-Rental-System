@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     try {
-        $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM User WHERE email = :email");
+        $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM user WHERE email = :email");
         $stmt_check->execute(['email' => $email]);
         if ($stmt_check->fetchColumn() > 0) {
             $_SESSION['errors'] = ["Email already exists. Use a different email address."];
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
 
-        $stmt = $pdo->prepare("INSERT INTO User (username, email, phone_No, password, role, profile_image) VALUES (:name, :email, :phone, :password, :role, :image)");
+        $stmt = $pdo->prepare("INSERT INTO user (username, email, phone_No, password, role, profile_image) VALUES (:name, :email, :phone, :password, :role, :image)");
         $stmt->execute([
             'name' => $name,
             'email' => $email,

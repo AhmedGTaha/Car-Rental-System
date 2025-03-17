@@ -10,7 +10,7 @@ $email = $_GET['id'];
 
 try {
     // Get the user profile image from the database
-    $sql = "SELECT profile_image FROM User WHERE email = :email";
+    $sql = "SELECT profile_image FROM user WHERE email = :email";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':email', $email);
     $stmt->execute();
@@ -24,7 +24,7 @@ try {
     $profile_image = $user['profile_image']; // Image path from database
 
     // Delete the user from the DB
-    $sql = "DELETE FROM User WHERE email = :email";
+    $sql = "DELETE FROM user WHERE email = :email";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':email', $email);
     

@@ -16,7 +16,7 @@ if (!isset($_GET['id'])) {
 $plateNo = $_GET['id'];
 
 // Fetch existing car details
-$sql = "SELECT * FROM Car WHERE plate_No = :plateNo";
+$sql = "SELECT * FROM car WHERE plate_No = :plateNo";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':plateNo', $plateNo);
 $stmt->execute();
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             // Update query
-            $sql = "UPDATE Car SET 
+            $sql = "UPDATE car SET 
                     model_name = :model_name, 
                     model_year = :model_year, 
                     type = :type, 

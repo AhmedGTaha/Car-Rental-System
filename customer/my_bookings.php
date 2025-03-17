@@ -13,9 +13,9 @@ try {
     $sql = "SELECT B.booking_id, B.plate_No, B.start_date, B.end_date, B.total_price, B.status, 
                    C.model_name, C.model_year, C.type, C.transmission, C.color, C.car_image, 
                    U.username, U.email
-            FROM Booking B
-            JOIN Car C ON B.plate_No = C.plate_No
-            JOIN User U ON B.user_id = U.ID
+            FROM booking B
+            JOIN car C ON B.plate_No = C.plate_No
+            JOIN user U ON B.user_id = U.ID
             WHERE U.email = :user_email
             ORDER BY B.start_date DESC";
 
