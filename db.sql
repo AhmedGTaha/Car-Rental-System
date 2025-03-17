@@ -1,6 +1,3 @@
-CREATE DATABASE CarRentalSystem;
-USE CarRentalSystem;
-
 -- User Table
 CREATE TABLE user (
     ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -29,14 +26,14 @@ CREATE TABLE car (
 CREATE TABLE booking (
     booking_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    user_email VARCHAR(255) NOT NULL,
+    user_email VARCHAR(100) NOT NULL,  -- Changed to match the user table's email column
     plate_No VARCHAR(20),
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     total_price DECIMAL(10,2) CHECK (total_price >= 0),
     status ENUM('confirmed', 'canceled') DEFAULT 'confirmed',
-    FOREIGN KEY (user_id) REFERENCES User(ID) ON DELETE CASCADE,
-    FOREIGN KEY (user_email) REFERENCES User(email) ON DELETE CASCADE,
-    FOREIGN KEY (plate_No) REFERENCES Car(plate_No) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user(ID) ON DELETE CASCADE,
+    FOREIGN KEY (user_email) REFERENCES user(email) ON DELETE CASCADE,
+    FOREIGN KEY (plate_No) REFERENCES car(plate_No) ON DELETE CASCADE,
     CHECK (start_date < end_date)
 );
