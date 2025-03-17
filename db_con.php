@@ -4,7 +4,7 @@ $username = "root";
 $password = "";
 
 try {
-  $pdo = new PDO("mysql:host=$servername;dbname=carrentalsystem", $username, $password);
+  $pdo = new PDO("mysql:host=$servername;dbname=CarRentalSystem", $username, $password);
   // set the PDO error mode to exception
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
